@@ -81,6 +81,7 @@ The `/hello` page syncs through Electric, which needs one-time setup on Railway.
    | --- | --- |
    | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` (direct connection, not a pooler) |
    | `ELECTRIC_SECRET` | a long random string |
+   | `PORT` | `3000` (Electric's port; Railway's healthcheck uses it) |
    | `ELECTRIC_STORAGE_DIR` | `/var/lib/electric/persistent` |
    | `ELECTRIC_DATABASE_USE_IPV6` | `true` |
    | `ELECTRIC_LISTEN_ON_IPV6` | `true` |
