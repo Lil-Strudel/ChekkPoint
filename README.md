@@ -6,7 +6,20 @@ To run this application:
 
 ```bash
 pnpm install
+cp .env.example .env
 pnpm dev
+```
+
+## Local services
+
+Postgres and Redis run in Docker via `compose.yaml`, using the credentials in `.env.example`. `pnpm dev` starts them automatically (and waits until they're healthy). They keep running after the dev server stops, so the next start is fast.
+
+```bash
+pnpm db:migrate      # apply migrations (services must be up)
+pnpm services:up     # start Postgres + Redis without the dev server
+pnpm services:down   # stop them (data is kept)
+pnpm services:reset  # wipe all data and start fresh
+pnpm services:logs   # follow container logs
 ```
 
 # Building For Production
