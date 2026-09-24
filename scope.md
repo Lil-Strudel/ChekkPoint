@@ -193,12 +193,56 @@ export const rawTimingStatusEnum = pgEnum("raw_timing_status", [
   "flagged_discrepancy",   // Variance with another hardware source exceeding threshold
 ]);
 
+export const externalPlatformEnum = pgEnum("external_platform", [
+  "ultrasignup",
+  "strava",
+  "duv",
+  "itra",
+  "athlinks",
+  "custom",
+]);
+
+export const profileVerificationStatusEnum = pgEnum("profile_verification_status", [
+  "unverified",
+  "candidate_matched",
+  "auto_verified",
+  "manual_verified",
+  "rejected",
+  "conflict",
+]);
+
+export const scrapeStatusEnum = pgEnum("scrape_status", [
+  "pending",
+  "queued",
+  "in_progress",
+  "succeeded",
+  "failed",
+  "rate_limited",
+  "stale",
+]);
+
+export const raceHistoryStatusEnum = pgEnum("race_history_status", [
+  "finished",
+  "dnf",
+  "dns",
+  "dq",
+  "in_progress",
+  "unknown",
+]);
+
+export const experienceTierEnum = pgEnum("experience_tier", [
+  "novice",
+  "intermediate",
+  "veteran",
+  "elite",
+]);
+
 // ============================================================================
 // 2. POLYMORPHIC JSONB TYPES & ZOD SCHEMAS
 // ============================================================================
 
 /**
- * Common Address Schema used across emergency contacts and organizations.
+ * Common Address Schema used across people and organizations.
  */
 export const AddressSchema = z.object({
   street: z.string().optional(),
@@ -209,24 +253,11 @@ export const AddressSchema = z.object({
 });
 
 /**
- * Emergency Contact Schema: Stored as a rich object rather than a raw string.
- * 'isOnSite' is critical for remote aid station medics to know whether to page 
- * the contact at the race village or initiate a long-distance phone call.
- */
-export const EmergencyContactSchema = z.object({
-  name: z.string(),
-  phone: z.string(),
-  relationship: z.string().optional(),
-  address: AddressSchema.optional(),
-  isOnSite: z.boolean().default(false),
-});
-
-/**
  * 1. Solo Competitor (Foot running, solo cycling, solo track sprint)
+ * Emergency contacts are modeled via direct reference on the entrants table.
  */
 export const SoloCompetitorSchema = z.object({
   kind: z.literal("solo_competitor"),
-  emergencyContact: EmergencyContactSchema,
   medicalNotes: z.string().optional(),
   pacerName: z.string().optional(),
   tShirtSize: z.string().optional(),
@@ -234,6 +265,7 @@ export const SoloCompetitorSchema = z.object({
 
 /**
  * 2. Vehicle Crew (Motorsport TSD Regularity, Rally, Two-person MTB)
+ * Emergency contacts are modeled via direct reference on the entrants table.
  */
 export const VehicleCrewSchema = z.object({
   kind: z.literal("vehicle_crew"),
@@ -241,13 +273,11 @@ export const VehicleCrewSchema = z.object({
     name: z.string(),
     licenseNumber: z.string(),
     phone: z.string().optional(),
-    emergencyContact: EmergencyContactSchema,
   }),
   coDriver: z.object({
     name: z.string(),
     licenseNumber: z.string(),
     phone: z.string().optional(),
-    emergencyContact: EmergencyContactSchema,
   }).optional(),
   vehicle: z.object({
     make: z.string(),
@@ -349,9 +379,11 @@ export const courses = pgTable("courses", {
   distanceMeters: doublePrecision("distance_meters").notNull(),
   elevationGainMeters: integer("elevation_gain_meters"),
   gpxRouteUrl: text("gpx_route_url"),
+  copiedFromCourseId: uuid("copied_from_course_id").references((): AnyPgColumn => courses.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
 }, (t) => [
   index("courses_org_idx").on(t.organizationId),
+  index("courses_copied_from_idx").on(t.copiedFromCourseId),
 ]);
 
 export const events = pgTable("events", {
@@ -411,10 +443,18 @@ export const courseSplits = pgTable("course_splits", {
   index("course_splits_course_dist_idx").on(t.courseId, t.distanceFromStartMeters),
 ]);
 
+export type PersonRole =
+  | "racer"
+  | "volunteer"
+  | "pacer"
+  | "crew"
+  | "official"
+  | "emergency_contact";
+
 /**
  * People: Global human identity.
  * Roles array: Automatically maintained array of roles this person holds across organizations and events
- * (e.g. ['racer', 'volunteer', 'pacer']). Having roles stored directly on the person avoids expensive
+ * (e.g. ['racer', 'volunteer', 'pacer', 'emergency_contact']). Having roles stored directly on the person avoids expensive
  * multi-table joins when filtering volunteer directories or checking portal access.
  */
 export const people = pgTable("people", {
@@ -426,7 +466,7 @@ export const people = pgTable("people", {
   email: text("email"),
   phone: text("phone"),
   address: jsonb("address").$type<z.infer<typeof AddressSchema>>(),
-  roles: jsonb("roles").$type<Array<"racer" | "volunteer" | "pacer" | "crew" | "official">>().notNull().default([]),
+  roles: jsonb("roles").$type<PersonRole[]>().notNull().default([]),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
 }, (t) => [
   index("people_email_idx").on(t.email),
@@ -448,6 +488,11 @@ export const entrants = pgTable("entrants", {
   division: text("division").notNull(), // e.g. "Open M", "F40-49", "Pro Men DH"
   participantData: jsonb("participant_data").$type<ParticipantData>().notNull(),
   
+  // Direct Emergency Contact Reference (Normalized 1:1 relation to people)
+  emergencyContactPersonId: uuid("emergency_contact_person_id").references(() => people.id, { onDelete: "set null" }),
+  emergencyContactRelationship: text("emergency_contact_relationship"),
+  emergencyContactIsOnSite: boolean("emergency_contact_is_on_site").default(false).notNull(),
+
   // Staggered / Wave Start Offsets
   scheduledStartTime: timestamp("scheduled_start_time", { withTimezone: true, mode: "date" }),
   actualStartTime: timestamp("actual_start_time", { withTimezone: true, mode: "date" }),
@@ -463,6 +508,7 @@ export const entrants = pgTable("entrants", {
   uniqueIndex("entrants_event_competitor_idx").on(t.eventId, t.competitorNumber),
   index("entrants_transponder_idx").on(t.rfidCode),
   index("entrants_status_idx").on(t.eventId, t.status),
+  index("entrants_emergency_contact_person_idx").on(t.emergencyContactPersonId),
 ]);
 
 /**
@@ -576,6 +622,110 @@ export const splitTimeAudits = pgTable("split_time_audits", {
 ]);
 
 // ============================================================================
+// 7. COMPETITOR HISTORY & PROJECTIONS
+// ============================================================================
+
+/**
+ * External platform profiles linked to an individual person (e.g. UltraSignup, Strava, DUV, ITRA).
+ */
+export const personExternalProfiles = pgTable("person_external_profiles", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  personId: uuid("person_id").references(() => people.id, { onDelete: "cascade" }).notNull(),
+  platform: externalPlatformEnum("platform").notNull(),
+  externalIdentifier: text("external_identifier").notNull(),
+  profileUrl: text("profile_url"),
+  verificationStatus: profileVerificationStatusEnum("verification_status").default("unverified").notNull(),
+  matchConfidence: doublePrecision("match_confidence"),
+  matchMetadata: jsonb("match_metadata"),
+  scrapeStatus: scrapeStatusEnum("scrape_status").default("pending").notNull(),
+  lastScrapedAt: timestamp("last_scraped_at", { withTimezone: true, mode: "date" }),
+  rawPayload: jsonb("raw_payload"),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+}, (t) => [
+  uniqueIndex("person_external_profiles_platform_identifier_idx").on(t.platform, t.externalIdentifier),
+  index("person_external_profiles_person_idx").on(t.personId),
+  index("person_external_profiles_scrape_status_idx").on(t.scrapeStatus),
+]);
+
+/**
+ * Historical race performances achieved by a person across platforms and years.
+ */
+export const personRaceHistory = pgTable("person_race_history", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  personId: uuid("person_id").references(() => people.id, { onDelete: "cascade" }).notNull(),
+  externalProfileId: uuid("external_profile_id").references(() => personExternalProfiles.id, { onDelete: "set null" }),
+  platform: externalPlatformEnum("platform").notNull(),
+  raceName: text("race_name").notNull(),
+  raceDate: text("race_date").notNull(), // ISO Date string YYYY-MM-DD
+  distanceMeters: doublePrecision("distance_meters"),
+  distanceLabel: text("distance_label"), // e.g. "50K", "100M", "Marathon"
+  elevationGainMeters: doublePrecision("elevation_gain_meters"),
+  elapsedSeconds: integer("elapsed_seconds"),
+  finishTimeFormatted: text("finish_time_formatted"), // e.g. "14:22:31"
+  overallPlace: integer("overall_place"),
+  genderPlace: integer("gender_place"),
+  categoryPlace: integer("category_place"),
+  totalFinishers: integer("total_finishers"),
+  status: raceHistoryStatusEnum("status").default("finished").notNull(),
+  sourceUrl: text("source_url"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+}, (t) => [
+  index("person_race_history_person_idx").on(t.personId),
+  index("person_race_history_date_idx").on(t.raceDate),
+  index("person_race_history_distance_idx").on(t.distanceMeters),
+]);
+
+/**
+ * Materialized 1:1 career intelligence rollup for a person.
+ */
+export const personHistoricalSummaries = pgTable("person_historical_summaries", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  personId: uuid("person_id").references(() => people.id, { onDelete: "cascade" }).notNull(),
+  totalRaces: integer("total_races").default(0).notNull(),
+  totalFinishes: integer("total_finishes").default(0).notNull(),
+  totalDnfs: integer("total_dnfs").default(0).notNull(),
+  dnfRate: doublePrecision("dnf_rate").default(0).notNull(), // 0.0 to 1.0
+  maxDistanceMeters: doublePrecision("max_distance_meters").default(0).notNull(),
+  maxElevationGainMeters: doublePrecision("max_elevation_gain_meters").default(0).notNull(),
+  avgPaceSecondsPerKm: doublePrecision("avg_pace_seconds_per_km"),
+  experienceTier: experienceTierEnum("experience_tier").default("novice").notNull(),
+  ultrasignupRank: doublePrecision("ultrasignup_rank"), // e.g. 88.42%
+  itraPerformanceIndex: integer("itra_performance_index"), // e.g. 640
+  lastRaceDate: text("last_race_date"),
+  confidenceScore: doublePrecision("confidence_score").default(1.0).notNull(),
+  safetyTriageNotes: text("safety_triage_notes"),
+  computedAt: timestamp("computed_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+}, (t) => [
+  uniqueIndex("person_historical_summaries_person_idx").on(t.personId),
+  index("person_historical_summaries_tier_idx").on(t.experienceTier),
+]);
+
+/**
+ * Event-specific materialized pacing projection and safety triage model for an entrant.
+ */
+export const entrantHistoricalProjections = pgTable("entrant_historical_projections", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  entrantId: uuid("entrant_id").references(() => entrants.id, { onDelete: "cascade" }).notNull(),
+  personId: uuid("person_id").references(() => people.id, { onDelete: "cascade" }).notNull(),
+  projectedFinishSeconds: integer("projected_finish_seconds"),
+  projectedPaceSecondsPerKm: doublePrecision("projected_pace_seconds_per_km"),
+  projectedArrivalTimes: jsonb("projected_arrival_times").$type<Record<string, { secondsFromStart: number; projectedTimeUtc: string }>>(),
+  confidenceBandLowSeconds: integer("confidence_band_low_seconds"),
+  confidenceBandHighSeconds: integer("confidence_band_high_seconds"),
+  expectedCutoffRisk: boolean("expected_cutoff_risk").default(false).notNull(),
+  volunteersSarSafetyBadge: text("volunteers_sar_safety_badge"),
+  projectionMethod: text("projection_method").default("historical_pacing").notNull(),
+  computedAt: timestamp("computed_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+}, (t) => [
+  uniqueIndex("entrant_historical_projections_entrant_idx").on(t.entrantId),
+  index("entrant_historical_projections_person_idx").on(t.personId),
+  index("entrant_historical_projections_cutoff_risk_idx").on(t.expectedCutoffRisk),
+]);
+
+// ============================================================================
 // 4. DRIZZLE RELATIONS (FOR RELATIONAL QUERY API)
 // ============================================================================
 
@@ -598,6 +748,14 @@ export const coursesRelations = relations(courses, ({ one, many }) => ({
   organization: one(organizations, {
     fields: [courses.organizationId],
     references: [organizations.id],
+  }),
+  copiedFromCourse: one(courses, {
+    fields: [courses.copiedFromCourseId],
+    references: [courses.id],
+    relationName: "courseCopies",
+  }),
+  derivedCourses: many(courses, {
+    relationName: "courseCopies",
   }),
   events: many(events),
   courseSplits: many(courseSplits),
@@ -636,8 +794,13 @@ export const courseSplitsRelations = relations(courseSplits, ({ one, many }) => 
   timeAllowances: many(timeAllowances),
 }));
 
-export const peopleRelations = relations(people, ({ many }) => ({
-  entrants: many(entrants),
+export const peopleRelations = relations(people, ({ many, one }) => ({
+  entrants: many(entrants, { relationName: "entrant" }),
+  emergencyContactForEntrants: many(entrants, { relationName: "emergencyContact" }),
+  externalProfiles: many(personExternalProfiles),
+  raceHistory: many(personRaceHistory),
+  historicalSummary: one(personHistoricalSummaries),
+  projections: many(entrantHistoricalProjections),
 }));
 
 export const entrantsRelations = relations(entrants, ({ one, many }) => ({
@@ -648,6 +811,12 @@ export const entrantsRelations = relations(entrants, ({ one, many }) => ({
   person: one(people, {
     fields: [entrants.personId],
     references: [people.id],
+    relationName: "entrant",
+  }),
+  emergencyContactPerson: one(people, {
+    fields: [entrants.emergencyContactPersonId],
+    references: [people.id],
+    relationName: "emergencyContact",
   }),
   droppedSplit: one(courseSplits, {
     fields: [entrants.droppedSplitId],
@@ -655,6 +824,44 @@ export const entrantsRelations = relations(entrants, ({ one, many }) => ({
   }),
   scoredSplitTimes: many(scoredSplitTimes),
   timeAllowances: many(timeAllowances),
+  historicalProjection: one(entrantHistoricalProjections),
+}));
+
+export const personExternalProfilesRelations = relations(personExternalProfiles, ({ one, many }) => ({
+  person: one(people, {
+    fields: [personExternalProfiles.personId],
+    references: [people.id],
+  }),
+  raceHistory: many(personRaceHistory),
+}));
+
+export const personRaceHistoryRelations = relations(personRaceHistory, ({ one }) => ({
+  person: one(people, {
+    fields: [personRaceHistory.personId],
+    references: [people.id],
+  }),
+  externalProfile: one(personExternalProfiles, {
+    fields: [personRaceHistory.externalProfileId],
+    references: [personExternalProfiles.id],
+  }),
+}));
+
+export const personHistoricalSummariesRelations = relations(personHistoricalSummaries, ({ one }) => ({
+  person: one(people, {
+    fields: [personHistoricalSummaries.personId],
+    references: [people.id],
+  }),
+}));
+
+export const entrantHistoricalProjectionsRelations = relations(entrantHistoricalProjections, ({ one }) => ({
+  entrant: one(entrants, {
+    fields: [entrantHistoricalProjections.entrantId],
+    references: [entrants.id],
+  }),
+  person: one(people, {
+    fields: [entrantHistoricalProjections.personId],
+    references: [people.id],
+  }),
 }));
 
 export const rawTimingEventsRelations = relations(rawTimingEvents, ({ one, many }) => ({
@@ -726,6 +933,18 @@ export type NewPerson = InferInsertModel<typeof people>;
 
 export type Entrant = InferSelectModel<typeof entrants>;
 export type NewEntrant = InferInsertModel<typeof entrants>;
+
+export type PersonExternalProfile = InferSelectModel<typeof personExternalProfiles>;
+export type NewPersonExternalProfile = InferInsertModel<typeof personExternalProfiles>;
+
+export type PersonRaceHistory = InferSelectModel<typeof personRaceHistory>;
+export type NewPersonRaceHistory = InferInsertModel<typeof personRaceHistory>;
+
+export type PersonHistoricalSummary = InferSelectModel<typeof personHistoricalSummaries>;
+export type NewPersonHistoricalSummary = InferInsertModel<typeof personHistoricalSummaries>;
+
+export type EntrantHistoricalProjection = InferSelectModel<typeof entrantHistoricalProjections>;
+export type NewEntrantHistoricalProjection = InferInsertModel<typeof entrantHistoricalProjections>;
 
 export type RawTimingEvent = InferSelectModel<typeof rawTimingEvents>;
 export type NewRawTimingEvent = InferInsertModel<typeof rawTimingEvents>;
