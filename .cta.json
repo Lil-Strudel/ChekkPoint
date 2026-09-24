@@ -7,14 +7,11 @@
   "tailwind": true,
   "projectPreset": "default",
   "addOnOptions": {},
-  "git": false,
+  "git": true,
   "install": true,
   "intent": true,
   "routerOnly": false,
   "version": 1,
   "framework": "solid",
-  "chosenAddOns": [
-    "biome",
-    "nitro"
-  ]
+  "chosenAddOns": ["biome", "nitro"]
 }

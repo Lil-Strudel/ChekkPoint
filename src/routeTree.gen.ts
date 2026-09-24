@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as HelloRouteImport } from './routes/hello'
+import { Route as RedisRouteImport } from './routes/redis'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const HelloRoute = HelloRouteImport.update({
   path: '/hello',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RedisRoute = RedisRouteImport.update({
+  id: '/redis',
+  path: '/redis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/hello': typeof HelloRoute
+  '/redis': typeof RedisRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/hello': typeof HelloRoute
+  '/redis': typeof RedisRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/hello': typeof HelloRoute
+  '/redis': typeof RedisRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/hello'
+  fullPaths: '/' | '/about' | '/hello' | '/redis'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/hello'
-  id: '__root__' | '/' | '/about' | '/hello'
+  to: '/' | '/about' | '/hello' | '/redis'
+  id: '__root__' | '/' | '/about' | '/hello' | '/redis'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   HelloRoute: typeof HelloRoute
+  RedisRoute: typeof RedisRoute
 }
 
 declare module '@tanstack/solid-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof HelloRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/redis': {
+      id: '/redis'
+      path: '/redis'
+      fullPath: '/redis'
+      preLoaderRoute: typeof RedisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,16 +106,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   HelloRoute: HelloRoute,
+  RedisRoute: RedisRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/solid-start'
-declare module '@tanstack/solid-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

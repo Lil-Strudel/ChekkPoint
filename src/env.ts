@@ -5,6 +5,7 @@ import * as z from "zod";
 export const env = createEnv({
 	server: {
 		DATABASE_URL: z.url(),
+		REDIS_URL: z.url(),
 	},
 	runtimeEnv: process.env,
 	emptyStringAsUndefined: true,

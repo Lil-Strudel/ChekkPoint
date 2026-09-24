@@ -35,6 +35,13 @@ export default function Header() {
 					>
 						Hello DB
 					</Link>
+					<Link
+						to="/redis"
+						class="nav-link"
+						activeProps={{ class: "nav-link is-active" }}
+					>
+						Redis
+					</Link>
 					<a
 						href="https://tanstack.com/start/latest/docs/framework/solid/overview"
 						target="_blank"
