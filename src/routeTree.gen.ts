@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as HelloRouteImport } from './routes/hello'
 import { Route as RedisRouteImport } from './routes/redis'
+import { Route as ApiShapesHelloWorldRouteImport } from './routes/api/shapes/hello-world'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const RedisRoute = RedisRouteImport.update({
   path: '/redis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiShapesHelloWorldRoute = ApiShapesHelloWorldRouteImport.update({
+  id: '/api/shapes/hello-world',
+  path: '/api/shapes/hello-world',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/hello': typeof HelloRoute
   '/redis': typeof RedisRoute
+  '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/hello': typeof HelloRoute
   '/redis': typeof RedisRoute
+  '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,20 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/hello': typeof HelloRoute
   '/redis': typeof RedisRoute
+  '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/hello' | '/redis'
+  fullPaths: '/' | '/about' | '/hello' | '/redis' | '/api/shapes/hello-world'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/hello' | '/redis'
-  id: '__root__' | '/' | '/about' | '/hello' | '/redis'
+  to: '/' | '/about' | '/hello' | '/redis' | '/api/shapes/hello-world'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/hello'
+    | '/redis'
+    | '/api/shapes/hello-world'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +82,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   HelloRoute: typeof HelloRoute
   RedisRoute: typeof RedisRoute
+  ApiShapesHelloWorldRoute: typeof ApiShapesHelloWorldRoute
 }
 
 declare module '@tanstack/solid-router' {
@@ -99,6 +115,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof RedisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/shapes/hello-world': {
+      id: '/api/shapes/hello-world'
+      path: '/api/shapes/hello-world'
+      fullPath: '/api/shapes/hello-world'
+      preLoaderRoute: typeof ApiShapesHelloWorldRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +130,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   HelloRoute: HelloRoute,
   RedisRoute: RedisRoute,
+  ApiShapesHelloWorldRoute: ApiShapesHelloWorldRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

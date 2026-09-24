@@ -20,8 +20,15 @@
     "services:logs": "docker compose logs -f"
   },
   "dependencies": {
+    "@electric-sql/client": "^1.5.28",
+    "@journeyapps/wa-sqlite": "^1.7.2",
     "@t3-oss/env-core": "^0.13.11",
     "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/browser-db-sqlite-persistence": "^0.2.23",
+    "@tanstack/db": "^0.9.2",
+    "@tanstack/electric-db-collection": "^0.4.10",
+    "@tanstack/offline-transactions": "^1.0.56",
+    "@tanstack/solid-db": "^0.2.45",
     "@tanstack/solid-router": "latest",
     "@tanstack/solid-router-devtools": "latest",
     "@tanstack/solid-start": "latest",

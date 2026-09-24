@@ -1,5 +1,7 @@
 packages:
   - '.'
 allowBuilds:
+  # postinstall only fetches an unused PowerSync binary
+  '@journeyapps/wa-sqlite': false
   esbuild: true
   lightningcss: true

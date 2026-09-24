@@ -7,6 +7,10 @@ import solidPlugin from "vite-plugin-solid";
 
 export default defineConfig({
 	resolve: { tsconfigPaths: true },
+	optimizeDeps: {
+		// Pre-bundling breaks the OPFS worker's import.meta.url path.
+		exclude: ["@tanstack/browser-db-sqlite-persistence"],
+	},
 	plugins: [
 		devtools(),
 		nitro(),

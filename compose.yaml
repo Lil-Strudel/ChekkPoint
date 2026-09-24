@@ -4,6 +4,13 @@ name: chekkpoint
 services:
   postgres:
     image: postgres:18-alpine
+    command:
+      [
+        "postgres",
+        "-c", "wal_level=logical",
+        "-c", "max_wal_senders=10",
+        "-c", "max_replication_slots=10",
+      ]
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -31,6 +38,26 @@ services:
       timeout: 5s
       retries: 15
 
+  electric:
+    image: electricsql/electric:1.8.1
+    environment:
+      DATABASE_URL: postgresql://user:password@postgres:5432/chekkpoint?sslmode=disable
+      ELECTRIC_INSECURE: "true"
+      ELECTRIC_STORAGE_DIR: /var/lib/electric/persistent
+    ports:
+      - "127.0.0.1:3001:3000"
+    volumes:
+      - electric-data:/var/lib/electric/persistent
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3000/v1/health | grep -q active"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
 volumes:
   postgres-data:
   redis-data:
+  electric-data:

@@ -12,11 +12,13 @@ pnpm dev
 
 ## Local services
 
-Postgres and Redis run in Docker via `compose.yaml`, using the credentials in `.env.example`. `pnpm dev` starts them automatically (and waits until they're healthy). They keep running after the dev server stops, so the next start is fast.
+Postgres, Redis and Electric run in Docker via `compose.yaml`, using the credentials in `.env.example`. `pnpm dev` starts them automatically (and waits until they're healthy). They keep running after the dev server stops, so the next start is fast.
+
+Postgres runs with `wal_level=logical` so [Electric](https://electric-sql.com) can stream changes. Electric listens on `localhost:3001`; the browser never talks to it directly, only through the app's shape proxy (`src/electric/proxy.ts`).
 
 ```bash
 pnpm db:migrate      # apply migrations (services must be up)
-pnpm services:up     # start Postgres + Redis without the dev server
+pnpm services:up     # start Postgres, Redis + Electric without the dev server
 pnpm services:down   # stop them (data is kept)
 pnpm services:reset  # wipe all data and start fresh
 pnpm services:logs   # follow container logs
@@ -56,6 +58,43 @@ node dist/server/index.mjs
 The build output is a self-contained Node server. To deploy, push the `dist/` directory to your host (Render, Fly.io, your own VPS, etc.) and run the server command above.
 
 For host-specific presets (Vercel, Netlify, Cloudflare, AWS Lambda, etc.) and tuning, see https://v3.nitro.build/deploy.
+
+## Railway: Electric sync
+
+The `/hello` page syncs through Electric, which needs one-time setup on Railway.
+
+1. **Enable logical replication on Postgres.** Connect (`railway connect Postgres`, or `psql` with the public URL), then:
+
+   ```sql
+   ALTER SYSTEM SET wal_level = 'logical';
+   ```
+
+   Restart the Postgres service and check that `SHOW wal_level;` returns `logical`. If the setting doesn't survive a restart, set the service's start command to:
+
+   ```
+   /usr/bin/tini -g -- /usr/local/bin/wrapper.sh postgres -p 5432 -c listen_addresses=* -c wal_level=logical
+   ```
+
+2. **Add an Electric service** from the Docker image `electricsql/electric:1.8.1` (keep this in step with `compose.yaml`). Give it these variables:
+
+   | Variable | Value |
+   | --- | --- |
+   | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` (direct connection, not a pooler) |
+   | `ELECTRIC_SECRET` | a long random string |
+   | `ELECTRIC_STORAGE_DIR` | `/var/lib/electric/persistent` |
+   | `ELECTRIC_DATABASE_USE_IPV6` | `true` |
+   | `ELECTRIC_LISTEN_ON_IPV6` | `true` |
+
+   Attach a volume at `/var/lib/electric/persistent`, set the healthcheck path to `/v1/health`, and don't give it a public domain.
+
+3. **Point the app at Electric** by adding these to the app service:
+
+   | Variable | Value |
+   | --- | --- |
+   | `ELECTRIC_URL` | `http://${{Electric.RAILWAY_PRIVATE_DOMAIN}}:3000` |
+   | `ELECTRIC_SECRET` | `${{Electric.ELECTRIC_SECRET}}` |
+
+4. **Apply migrations** against Railway Postgres: `DATABASE_URL=<public url> pnpm db:migrate`.
 
 
 
