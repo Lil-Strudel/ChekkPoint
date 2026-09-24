@@ -12,6 +12,7 @@
 			"**/.vscode/**/*",
 			"**/index.html",
 			"**/vite.config.ts",
+			"**/drizzle.config.ts",
 			"!**/src/routeTree.gen.ts"
 		]
 	},
