@@ -17,15 +17,15 @@
     "@tanstack/solid-router": "latest",
     "@tanstack/solid-router-devtools": "latest",
     "@tanstack/solid-start": "latest",
-    "nitro": "3.0.260610-beta",
+    "nitro": "3.0.260903-beta",
     "solid-js": "^1.9.12",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.5",
+    "@biomejs/biome": "2.5.14",
     "@tanstack/devtools-vite": "latest",
     "@tanstack/router-cli": "^1.133.21",
-    "typescript": "^6.0.2",
+    "typescript": "^7.0.2",
     "vite": "^8.0.0",
     "vite-plugin-solid": "^2.11.12"
   },
