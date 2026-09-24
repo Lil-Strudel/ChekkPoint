@@ -13,7 +13,7 @@ export default function Header() {
 
 				<div class="ml-auto flex items-center gap-2"></div>
 
-				<div class="order-3 flex w-full flex-wrap items-center gap-x-4 gap-y-1 pb-1 text-sm font-semibold sm:order-2 sm:w-auto sm:flex-nowrap sm:pb-0">
+				<div class="order-3 flex w-full flex-wrap items-center gap-y-2.5 sm:gap-x-3 md:gap-x-4 pb-1 text-sm font-semibold sm:order-2 sm:w-auto md:flex-nowrap sm:pb-0">
 					<Link
 						to="/"
 						class="nav-link"
@@ -41,6 +41,13 @@ export default function Header() {
 						activeProps={{ class: "nav-link is-active" }}
 					>
 						Redis
+					</Link>
+					<Link
+						to="/manage-db"
+						class="nav-link"
+						activeProps={{ class: "nav-link is-active" }}
+					>
+						Manage DB
 					</Link>
 					<a
 						href="https://tanstack.com/start/latest/docs/framework/solid/overview"
