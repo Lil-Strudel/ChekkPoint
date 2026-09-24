@@ -10,7 +10,10 @@
     "preview": "vite preview",
     "format": "biome format",
     "lint": "biome lint",
-    "check": "biome check"
+    "check": "biome check",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.11",
@@ -18,7 +21,9 @@
     "@tanstack/solid-router": "latest",
     "@tanstack/solid-router-devtools": "latest",
     "@tanstack/solid-start": "latest",
+    "drizzle-orm": "1.0.0-rc.4",
     "nitro": "3.0.260903-beta",
+    "pg": "^8.23.0",
     "solid-js": "^1.9.12",
     "tailwindcss": "^4.1.18",
     "zod": "^4.6.5"
@@ -28,6 +33,9 @@
     "@tanstack/devtools-vite": "latest",
     "@tanstack/router-cli": "^1.133.21",
     "@types/node": "^26.6.2",
+    "@types/pg": "^8.23.1",
+    "dotenv": "^18.0.3",
+    "drizzle-kit": "1.0.0-rc.4",
     "typescript": "^7.0.2",
     "vite": "^8.0.0",
     "vite-plugin-solid": "^2.11.12"

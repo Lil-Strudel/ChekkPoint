@@ -28,6 +28,13 @@ export default function Header() {
           >
             About
           </Link>
+          <Link
+            to="/hello"
+            class="nav-link"
+            activeProps={{ class: 'nav-link is-active' }}
+          >
+            Hello DB
+          </Link>
           <a
             href="https://tanstack.com/start/latest/docs/framework/solid/overview"
             target="_blank"

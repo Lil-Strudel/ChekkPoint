@@ -1,0 +1,88 @@
+{
+  "version": "8",
+  "dialect": "postgres",
+  "id": "35ddbb1c-731d-42b1-b770-108d6f61cd55",
+  "prevIds": [
+    "00000000-0000-0000-0000-000000000000"
+  ],
+  "ddl": [
+    {
+      "isRlsEnabled": false,
+      "name": "hello_world",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": {
+        "type": "always",
+        "name": "hello_world_id_seq",
+        "increment": "1",
+        "startWith": "1",
+        "minValue": "1",
+        "maxValue": "2147483647",
+        "cache": 1,
+        "cycle": false
+      },
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "hello_world"
+    },
+    {
+      "type": "varchar(255)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "message",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "hello_world"
+    },
+    {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "hello_world"
+    },
+    {
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "hello_world"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "hello_world_pkey",
+      "schema": "public",
+      "table": "hello_world",
+      "entityType": "pks"
+    }
+  ],
+  "renames": []
+}
