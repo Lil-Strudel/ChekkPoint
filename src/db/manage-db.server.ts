@@ -6,9 +6,12 @@ import {
 	courses,
 	entrantHistoricalProjections,
 	entrants,
+	eventGroupStaff,
+	eventGroupStaffTimingPoints,
 	eventGroups,
 	events,
 	helloWorld,
+	organizationMembers,
 	organizations,
 	people,
 	personExternalProfiles,
@@ -19,6 +22,7 @@ import {
 	splitTimeAudits,
 	timeAllowances,
 	timingPoints,
+	users,
 } from "./schema";
 import { type CollectionKey, isCollectionKey } from "./schema-metadata";
 
@@ -39,6 +43,10 @@ export const tableMap = {
 	scoredSplitTimes,
 	timeAllowances,
 	splitTimeAudits,
+	users,
+	organizationMembers,
+	eventGroupStaff,
+	eventGroupStaffTimingPoints,
 	helloWorld,
 } as const;
 

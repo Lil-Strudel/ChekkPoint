@@ -15,6 +15,7 @@ export type CollectionCategory =
 	| "Write Plane (Audit Ledger)"
 	| "Read Plane (Standings)"
 	| "Operations & Audits"
+	| "Access & Staffing"
 	| "System Demo";
 
 export type CollectionKey =
@@ -34,6 +35,10 @@ export type CollectionKey =
 	| "scoredSplitTimes"
 	| "timeAllowances"
 	| "splitTimeAudits"
+	| "users"
+	| "organizationMembers"
+	| "eventGroupStaff"
+	| "eventGroupStaffTimingPoints"
 	| "helloWorld";
 
 export const ALL_COLLECTION_KEYS: readonly CollectionKey[] = [
@@ -53,6 +58,10 @@ export const ALL_COLLECTION_KEYS: readonly CollectionKey[] = [
 	"scoredSplitTimes",
 	"timeAllowances",
 	"splitTimeAudits",
+	"users",
+	"organizationMembers",
+	"eventGroupStaff",
+	"eventGroupStaffTimingPoints",
 	"helloWorld",
 ] as const;
 
@@ -122,6 +131,7 @@ export const COLLECTION_CATEGORIES: readonly CollectionCategory[] = [
 	"Write Plane (Audit Ledger)",
 	"Read Plane (Standings)",
 	"Operations & Audits",
+	"Access & Staffing",
 	"System Demo",
 ] as const;
 
@@ -158,6 +168,12 @@ export const COLLECTIONS: readonly CollectionMetadata[] = [
 				description:
 					"Physical timing hardware and checkpoint stations owned/managed by this organization.",
 			},
+			{
+				kind: "hasMany",
+				targetCollectionId: "organizationMembers",
+				foreignKey: "organizationId",
+				description: "Users who belong to this organization, with their roles.",
+			},
 		],
 		fields: [
 			{
@@ -182,6 +198,19 @@ export const COLLECTIONS: readonly CollectionMetadata[] = [
 				constraints: ["Unique"],
 				description:
 					"URL-safe routing identifier used in tenant subdomains or paths.",
+			},
+			{
+				name: "logo",
+				type: "text",
+				nullable: true,
+				description: "Logo URL (Better Auth organization plugin).",
+			},
+			{
+				name: "metadata",
+				type: "text",
+				nullable: true,
+				description:
+					"Serialized JSON metadata (Better Auth organization plugin).",
 			},
 			{
 				name: "createdAt",
@@ -873,10 +902,22 @@ export const COLLECTIONS: readonly CollectionMetadata[] = [
 		category: "Participants",
 		badge: "Global Identity",
 		shortDescription:
-			"Global human identity record with contact info, emergency contacts, and multi-role assignments.",
+			"Global human identity record with contact info, optionally linked to a login.",
 		operationalPurpose:
-			"Centralizes individual identity across the platform. Holds contact details and a roles array ('racer', 'volunteer', 'pacer', 'crew', 'official', 'emergency_contact'). Maintaining roles on the person record allows instant volunteer, competitor, and emergency contact directory lookups without complex multi-table joins.",
+			"Centralizes individual identity across the platform, whether or not the person ever signs in. Imported racers and emergency contacts exist without a login; a user claims their person record once their email is verified. What a person may do is scoped elsewhere: organization roles on organization_members, event-group staffing on event_group_staff, and racing on entrants.",
 		relationships: [
+			{
+				kind: "belongsTo",
+				targetCollectionId: "users",
+				foreignKey: "userId",
+				description: "Login that has claimed this person record, if any.",
+			},
+			{
+				kind: "hasMany",
+				targetCollectionId: "eventGroupStaff",
+				foreignKey: "personId",
+				description: "Event groups this person is staffing.",
+			},
 			{
 				kind: "hasMany",
 				targetCollectionId: "entrants",
@@ -928,6 +969,14 @@ export const COLLECTIONS: readonly CollectionMetadata[] = [
 				description: "Unique person identifier.",
 			},
 			{
+				name: "userId",
+				type: "uuid",
+				nullable: true,
+				constraints: ["FK -> users.id", "Unique"],
+				description:
+					"Login that claimed this person. Null for people who have never signed in.",
+			},
+			{
 				name: "firstName",
 				type: "text",
 				nullable: false,
@@ -968,14 +1017,6 @@ export const COLLECTIONS: readonly CollectionMetadata[] = [
 				type: "jsonb (AddressSchema)",
 				nullable: true,
 				description: "Residential address.",
-			},
-			{
-				name: "roles",
-				type: "jsonb (Array<PersonRole>)",
-				nullable: false,
-				defaultValue: "[]",
-				description:
-					"Assigned roles: 'racer', 'volunteer', 'pacer', 'crew', 'official', 'emergency_contact'.",
 			},
 			{
 				name: "createdAt",
@@ -2231,10 +2272,12 @@ export const COLLECTIONS: readonly CollectionMetadata[] = [
 				description: 'Reading hardware identifier (e.g. "ipad-station-4").',
 			},
 			{
-				name: "sourceOperator",
-				type: "text",
+				name: "recordedByPersonId",
+				type: "uuid",
 				nullable: true,
-				description: "Volunteer username or radio operator callsign.",
+				constraints: ["FK -> people.id"],
+				description:
+					"Person who entered the time. Null for unattended sources; radio operator callsigns are kept in rawPayload.",
 			},
 			{
 				name: "syncBatchId",
@@ -2673,9 +2716,10 @@ export const COLLECTIONS: readonly CollectionMetadata[] = [
 					"Hold reason: 'medical_hold', 'hazard_hold', 'gear_check'.",
 			},
 			{
-				name: "authorizedBy",
-				type: "text",
+				name: "authorizedByPersonId",
+				type: "uuid",
 				nullable: false,
+				constraints: ["FK -> people.id"],
 				description: "Authorizing medical officer or race steward.",
 			},
 			{
@@ -2755,10 +2799,11 @@ export const COLLECTIONS: readonly CollectionMetadata[] = [
 				description: "Snapshot of record state post modification.",
 			},
 			{
-				name: "changedBy",
-				type: "text",
+				name: "changedByPersonId",
+				type: "uuid",
 				nullable: false,
-				description: "Official user handle or steward ID.",
+				constraints: ["FK -> people.id"],
+				description: "Official or steward who made the change.",
 			},
 			{
 				name: "changeReason",
@@ -2780,6 +2825,351 @@ export const COLLECTIONS: readonly CollectionMetadata[] = [
 				columns: ["splitTimeId"],
 				rationale:
 					"Accelerates retrieval of modification history for a disputed competitor split.",
+			},
+		],
+	},
+	{
+		id: "users",
+		name: "Users",
+		tableName: "users",
+		category: "Access & Staffing",
+		badge: "Better Auth Login",
+		shortDescription:
+			"Login identities managed by Better Auth. Sessions, accounts, and verification tokens are not browsable here.",
+		operationalPurpose:
+			"A user is a way to sign in (password, email code, passkey, Google). The human behind it is the linked people record. `role` is the platform-wide role from the Better Auth admin plugin ('admin' for ChekkPoint staff); organization and event roles live elsewhere.",
+		relationships: [
+			{
+				kind: "hasMany",
+				targetCollectionId: "people",
+				foreignKey: "userId",
+				description: "Person record claimed by this login (at most one).",
+			},
+			{
+				kind: "hasMany",
+				targetCollectionId: "organizationMembers",
+				foreignKey: "userId",
+				description: "Organizations this user belongs to.",
+			},
+		],
+		fields: [
+			{
+				name: "id",
+				type: "uuid",
+				nullable: false,
+				defaultValue: "gen_random_uuid()",
+				constraints: ["PK"],
+				description: "Unique user identifier.",
+			},
+			{
+				name: "name",
+				type: "text",
+				nullable: false,
+				description: "Display name.",
+			},
+			{
+				name: "email",
+				type: "text",
+				nullable: false,
+				constraints: ["Unique"],
+				description: "Sign-in email.",
+			},
+			{
+				name: "emailVerified",
+				type: "boolean",
+				nullable: false,
+				defaultValue: "false",
+				description:
+					"True once the user proved mailbox ownership; gates claiming a person record.",
+			},
+			{
+				name: "image",
+				type: "text",
+				nullable: true,
+				description: "Avatar URL.",
+			},
+			{
+				name: "role",
+				type: "text",
+				nullable: true,
+				description: "Platform role from the admin plugin ('user' or 'admin').",
+			},
+			{
+				name: "banned",
+				type: "boolean",
+				nullable: true,
+				defaultValue: "false",
+				description: "Banned by a platform admin.",
+			},
+			{
+				name: "banReason",
+				type: "text",
+				nullable: true,
+				description: "Reason given for the ban.",
+			},
+			{
+				name: "banExpires",
+				type: "timestamp with time zone",
+				nullable: true,
+				description: "When the ban lifts.",
+			},
+			{
+				name: "createdAt",
+				type: "timestamp with time zone",
+				nullable: false,
+				defaultValue: "now()",
+				description: "Creation timestamp.",
+			},
+			{
+				name: "updatedAt",
+				type: "timestamp with time zone",
+				nullable: false,
+				defaultValue: "now()",
+				description: "Last modification timestamp.",
+			},
+		],
+		indexes: [
+			{
+				name: "users_email_unique",
+				columns: ["email"],
+				unique: true,
+				rationale: "One login per email address.",
+			},
+		],
+	},
+	{
+		id: "organizationMembers",
+		name: "Organization Members",
+		tableName: "organization_members",
+		category: "Access & Staffing",
+		badge: "Org Roles",
+		shortDescription:
+			"Which users belong to which organization, and with what roles.",
+		operationalPurpose:
+			"Managed by the Better Auth organization plugin. A user has one row per organization; `role` is a comma-separated list of owner, admin, director, steward, member. Organization roles apply to every event group the organization runs.",
+		relationships: [
+			{
+				kind: "belongsTo",
+				targetCollectionId: "organizations",
+				foreignKey: "organizationId",
+				description: "Organization the membership is in.",
+			},
+			{
+				kind: "belongsTo",
+				targetCollectionId: "users",
+				foreignKey: "userId",
+				description: "Member login.",
+			},
+		],
+		fields: [
+			{
+				name: "id",
+				type: "uuid",
+				nullable: false,
+				defaultValue: "gen_random_uuid()",
+				constraints: ["PK"],
+				description: "Unique membership identifier.",
+			},
+			{
+				name: "organizationId",
+				type: "uuid",
+				nullable: false,
+				constraints: ["FK -> organizations.id"],
+				description: "Organization.",
+			},
+			{
+				name: "userId",
+				type: "uuid",
+				nullable: false,
+				constraints: ["FK -> users.id"],
+				description: "Member.",
+			},
+			{
+				name: "role",
+				type: "text",
+				nullable: false,
+				defaultValue: "'member'",
+				description:
+					"Comma-separated roles: owner, admin, director, steward, member.",
+			},
+			{
+				name: "createdAt",
+				type: "timestamp with time zone",
+				nullable: false,
+				defaultValue: "now()",
+				description: "When the user joined.",
+			},
+		],
+		indexes: [
+			{
+				name: "organization_members_org_user_idx",
+				columns: ["organizationId", "userId"],
+				unique: true,
+				rationale: "One membership row per user per organization.",
+			},
+			{
+				name: "organization_members_user_idx",
+				columns: ["userId"],
+				rationale: "Lists a user's organizations.",
+			},
+		],
+	},
+	{
+		id: "eventGroupStaff",
+		name: "Event Group Staff",
+		tableName: "event_group_staff",
+		category: "Access & Staffing",
+		badge: "Staff Roster",
+		shortDescription:
+			"Volunteers, checkpoint captains, officials, and medical staff for an event group.",
+		operationalPurpose:
+			"Rosters people (not logins) so directors can staff an event before volunteers sign up. Once a volunteer's verified login claims their person record, the roles here grant access to that event group.",
+		relationships: [
+			{
+				kind: "belongsTo",
+				targetCollectionId: "eventGroups",
+				foreignKey: "eventGroupId",
+				description: "Event group being staffed.",
+			},
+			{
+				kind: "belongsTo",
+				targetCollectionId: "people",
+				foreignKey: "personId",
+				description: "Staff member.",
+			},
+			{
+				kind: "hasMany",
+				targetCollectionId: "eventGroupStaffTimingPoints",
+				foreignKey: "staffId",
+				description: "Timing points this staff member is stationed at.",
+			},
+		],
+		fields: [
+			{
+				name: "id",
+				type: "uuid",
+				nullable: false,
+				defaultValue: "gen_random_uuid()",
+				constraints: ["PK"],
+				description: "Unique staff assignment identifier.",
+			},
+			{
+				name: "eventGroupId",
+				type: "uuid",
+				nullable: false,
+				constraints: ["FK -> event_groups.id"],
+				description: "Event group.",
+			},
+			{
+				name: "personId",
+				type: "uuid",
+				nullable: false,
+				constraints: ["FK -> people.id"],
+				description: "Staff member.",
+			},
+			{
+				name: "roles",
+				type: "staff_role[]",
+				nullable: false,
+				description:
+					"One or more of volunteer, checkpoint_captain, official, medical.",
+			},
+			{
+				name: "createdAt",
+				type: "timestamp with time zone",
+				nullable: false,
+				defaultValue: "now()",
+				description: "When the person was rostered.",
+			},
+		],
+		enums: [
+			{
+				name: "staff_role",
+				values: [
+					{
+						value: "volunteer",
+						label: "Volunteer",
+						description: "Records times at assigned timing points.",
+					},
+					{
+						value: "checkpoint_captain",
+						label: "Checkpoint Captain",
+						description:
+							"Leads assigned timing points and may correct entries made there.",
+					},
+					{
+						value: "official",
+						label: "Official",
+						description:
+							"Event-group-wide timing authority: corrections, time allowances, DQs.",
+					},
+					{
+						value: "medical",
+						label: "Medical / SAR",
+						description: "Sees emergency contacts and safety information.",
+					},
+				],
+			},
+		],
+		indexes: [
+			{
+				name: "event_group_staff_group_person_idx",
+				columns: ["eventGroupId", "personId"],
+				unique: true,
+				rationale: "One roster row per person per event group.",
+			},
+			{
+				name: "event_group_staff_person_idx",
+				columns: ["personId"],
+				rationale: "Lists a person's staffing assignments.",
+			},
+		],
+	},
+	{
+		id: "eventGroupStaffTimingPoints",
+		name: "Staff Timing Points",
+		tableName: "event_group_staff_timing_points",
+		category: "Access & Staffing",
+		badge: "Checkpoint Assignment",
+		shortDescription:
+			"Timing points each volunteer or checkpoint captain is stationed at.",
+		operationalPurpose:
+			"Limits where a volunteer may record times and which entries a checkpoint captain may correct.",
+		relationships: [
+			{
+				kind: "belongsTo",
+				targetCollectionId: "eventGroupStaff",
+				foreignKey: "staffId",
+				description: "Staff assignment.",
+			},
+			{
+				kind: "belongsTo",
+				targetCollectionId: "timingPoints",
+				foreignKey: "timingPointId",
+				description: "Assigned timing point.",
+			},
+		],
+		fields: [
+			{
+				name: "staffId",
+				type: "uuid",
+				nullable: false,
+				constraints: ["PK", "FK -> event_group_staff.id"],
+				description: "Staff assignment.",
+			},
+			{
+				name: "timingPointId",
+				type: "uuid",
+				nullable: false,
+				constraints: ["PK", "FK -> timing_points.id"],
+				description: "Timing point.",
+			},
+		],
+		indexes: [
+			{
+				name: "event_group_staff_timing_points_tp_idx",
+				columns: ["timingPointId"],
+				rationale: "Lists who is stationed at a timing point.",
 			},
 		],
 	},

@@ -9,6 +9,7 @@ import {
 	jsonb,
 	pgEnum,
 	pgTable,
+	primaryKey,
 	snakeCase,
 	text,
 	timestamp,
@@ -17,6 +18,9 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { z } from "zod";
+import { users } from "./auth-schema";
+
+export * from "./auth-schema";
 
 // ============================================================================
 // 1. DOMAIN ENUMS
@@ -115,6 +119,13 @@ export const raceHistoryStatusEnum = pgEnum("race_history_status", [
 	"dq",
 	"in_progress",
 	"unknown",
+]);
+
+export const staffRoleEnum = pgEnum("staff_role", [
+	"volunteer", // Records times at assigned timing points
+	"checkpoint_captain", // Leads assigned timing points; may correct entries made there
+	"official", // Event-group-wide timing authority: corrections, allowances, DQs
+	"medical", // Sees emergency contacts and safety info
 ]);
 
 export const experienceTierEnum = pgEnum("experience_tier", [
@@ -239,13 +250,72 @@ export const organizations = pgTable("organizations", {
 	id: uuid("id").defaultRandom().primaryKey(),
 	name: text("name").notNull(),
 	slug: text("slug").notNull().unique(),
+	logo: text("logo"),
+	metadata: text("metadata"),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
 		.defaultNow()
 		.notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
 		.defaultNow()
+		.$onUpdate(() => new Date())
 		.notNull(),
 });
+
+/**
+ * Organization membership (Better Auth organization plugin `member` model).
+ * `role` is a comma-separated list of roles defined in src/auth/access.ts.
+ */
+export const organizationMembers = pgTable(
+	"organization_members",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		organizationId: uuid("organization_id")
+			.references(() => organizations.id, { onDelete: "cascade" })
+			.notNull(),
+		userId: uuid("user_id")
+			.references(() => users.id, { onDelete: "cascade" })
+			.notNull(),
+		role: text("role").default("member").notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+			.defaultNow()
+			.notNull(),
+	},
+	(t) => [
+		uniqueIndex("organization_members_org_user_idx").on(
+			t.organizationId,
+			t.userId,
+		),
+		index("organization_members_user_idx").on(t.userId),
+	],
+);
+
+/** Pending organization invitations (Better Auth organization plugin `invitation` model). */
+export const organizationInvitations = pgTable(
+	"organization_invitations",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		organizationId: uuid("organization_id")
+			.references(() => organizations.id, { onDelete: "cascade" })
+			.notNull(),
+		email: text("email").notNull(),
+		role: text("role"),
+		status: text("status").default("pending").notNull(),
+		inviterId: uuid("inviter_id")
+			.references(() => users.id, { onDelete: "cascade" })
+			.notNull(),
+		expiresAt: timestamp("expires_at", {
+			withTimezone: true,
+			mode: "date",
+		}).notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+			.defaultNow()
+			.notNull(),
+	},
+	(t) => [
+		index("organization_invitations_org_idx").on(t.organizationId),
+		index("organization_invitations_email_idx").on(t.email),
+	],
+);
 
 /**
  * EventGroup: The fundamental operational boundary.
@@ -406,24 +476,20 @@ export const courseSplits = pgTable(
 	],
 );
 
-export type PersonRole =
-	| "racer"
-	| "volunteer"
-	| "pacer"
-	| "crew"
-	| "official"
-	| "emergency_contact";
-
 /**
- * People: Global human identity.
- * Roles array: Automatically maintained array of roles this person holds across organizations and events
- * (e.g. ['racer', 'volunteer', 'pacer', 'emergency_contact']). Having roles stored directly on the person avoids expensive
- * multi-table joins when filtering volunteer directories or checking portal access.
+ * People: Global human identity, with or without a login.
+ * Imported racers and emergency contacts may never sign in; `userId` is set once a
+ * user with a verified email claims the record. What a person may do is scoped:
+ * organization roles live on organization_members, event-group staffing on
+ * event_group_staff, and racing on entrants.
  */
 export const people = pgTable(
 	"people",
 	{
 		id: uuid("id").defaultRandom().primaryKey(),
+		userId: uuid("user_id")
+			.unique()
+			.references(() => users.id, { onDelete: "set null" }),
 		firstName: text("first_name").notNull(),
 		lastName: text("last_name").notNull(),
 		gender: text("gender"),
@@ -431,7 +497,6 @@ export const people = pgTable(
 		email: text("email"),
 		phone: text("phone"),
 		address: jsonb("address").$type<z.infer<typeof AddressSchema>>(),
-		roles: jsonb("roles").$type<PersonRole[]>().notNull().default([]),
 		createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
 			.defaultNow()
 			.notNull(),
@@ -439,6 +504,51 @@ export const people = pgTable(
 	(t) => [
 		index("people_email_idx").on(t.email),
 		index("people_name_idx").on(t.lastName, t.firstName),
+	],
+);
+
+/**
+ * Event-group staffing. References people rather than users so a director can roster
+ * volunteers before they sign up; access follows once their user claims the person.
+ */
+export const eventGroupStaff = pgTable(
+	"event_group_staff",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		eventGroupId: uuid("event_group_id")
+			.references(() => eventGroups.id, { onDelete: "cascade" })
+			.notNull(),
+		personId: uuid("person_id")
+			.references(() => people.id, { onDelete: "cascade" })
+			.notNull(),
+		roles: staffRoleEnum("roles").array().notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+			.defaultNow()
+			.notNull(),
+	},
+	(t) => [
+		uniqueIndex("event_group_staff_group_person_idx").on(
+			t.eventGroupId,
+			t.personId,
+		),
+		index("event_group_staff_person_idx").on(t.personId),
+	],
+);
+
+/** Timing points a volunteer or checkpoint captain is stationed at. */
+export const eventGroupStaffTimingPoints = pgTable(
+	"event_group_staff_timing_points",
+	{
+		staffId: uuid("staff_id")
+			.references(() => eventGroupStaff.id, { onDelete: "cascade" })
+			.notNull(),
+		timingPointId: uuid("timing_point_id")
+			.references(() => timingPoints.id, { onDelete: "cascade" })
+			.notNull(),
+	},
+	(t) => [
+		primaryKey({ columns: [t.staffId, t.timingPointId] }),
+		index("event_group_staff_timing_points_tp_idx").on(t.timingPointId),
 	],
 );
 
@@ -536,7 +646,10 @@ export const rawTimingEvents = pgTable(
 		// Source Telemetry & Audit Trail
 		source: timingSourceEnum("source").notNull(),
 		sourceDeviceId: text("source_device_id"), // e.g. "ipad-station-4"
-		sourceOperator: text("source_operator"), // Volunteer username or radio operator handle
+		recordedByPersonId: uuid("recorded_by_person_id").references(
+			() => people.id,
+			{ onDelete: "set null" },
+		), // Null for unattended sources; radio operator handles go in rawPayload
 		syncBatchId: uuid("sync_batch_id"), // Identifies batch import operations from offline caches
 
 		withPacer: boolean("with_pacer").default(false).notNull(),
@@ -645,7 +758,9 @@ export const timeAllowances = pgTable(
 		}).notNull(),
 		durationSeconds: integer("duration_seconds").notNull(),
 		reason: text("reason").notNull(), // 'medical_hold', 'hazard_hold', 'gear_check'
-		authorizedBy: text("authorized_by").notNull(),
+		authorizedByPersonId: uuid("authorized_by_person_id")
+			.references(() => people.id, { onDelete: "restrict" })
+			.notNull(),
 		notes: text("notes"),
 		createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
 			.defaultNow()
@@ -667,7 +782,9 @@ export const splitTimeAudits = pgTable(
 		action: text("action").notNull(), // 'CREATED', 'UPDATED', 'DELETED', 'REBUILT', 'CONFIRMED'
 		previousState: jsonb("previous_state").$type<Record<string, unknown>>(),
 		newState: jsonb("new_state").$type<Record<string, unknown>>(),
-		changedBy: text("changed_by").notNull(),
+		changedByPersonId: uuid("changed_by_person_id")
+			.references(() => people.id, { onDelete: "restrict" })
+			.notNull(),
 		changeReason: text("change_reason").notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
 			.defaultNow()
@@ -865,7 +982,71 @@ export const organizationsRelations = relations(organizations, ({ many }) => ({
 	eventGroups: many(eventGroups),
 	courses: many(courses),
 	timingPoints: many(timingPoints),
+	members: many(organizationMembers),
+	invitations: many(organizationInvitations),
 }));
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+	person: one(people),
+	organizationMemberships: many(organizationMembers),
+}));
+
+export const organizationMembersRelations = relations(
+	organizationMembers,
+	({ one }) => ({
+		organization: one(organizations, {
+			fields: [organizationMembers.organizationId],
+			references: [organizations.id],
+		}),
+		user: one(users, {
+			fields: [organizationMembers.userId],
+			references: [users.id],
+		}),
+	}),
+);
+
+export const organizationInvitationsRelations = relations(
+	organizationInvitations,
+	({ one }) => ({
+		organization: one(organizations, {
+			fields: [organizationInvitations.organizationId],
+			references: [organizations.id],
+		}),
+		inviter: one(users, {
+			fields: [organizationInvitations.inviterId],
+			references: [users.id],
+		}),
+	}),
+);
+
+export const eventGroupStaffRelations = relations(
+	eventGroupStaff,
+	({ one, many }) => ({
+		eventGroup: one(eventGroups, {
+			fields: [eventGroupStaff.eventGroupId],
+			references: [eventGroups.id],
+		}),
+		person: one(people, {
+			fields: [eventGroupStaff.personId],
+			references: [people.id],
+		}),
+		timingPoints: many(eventGroupStaffTimingPoints),
+	}),
+);
+
+export const eventGroupStaffTimingPointsRelations = relations(
+	eventGroupStaffTimingPoints,
+	({ one }) => ({
+		staff: one(eventGroupStaff, {
+			fields: [eventGroupStaffTimingPoints.staffId],
+			references: [eventGroupStaff.id],
+		}),
+		timingPoint: one(timingPoints, {
+			fields: [eventGroupStaffTimingPoints.timingPointId],
+			references: [timingPoints.id],
+		}),
+	}),
+);
 
 export const eventGroupsRelations = relations(eventGroups, ({ one, many }) => ({
 	organization: one(organizations, {
@@ -874,6 +1055,7 @@ export const eventGroupsRelations = relations(eventGroups, ({ one, many }) => ({
 	}),
 	events: many(events),
 	rawTimingEvents: many(rawTimingEvents),
+	staff: many(eventGroupStaff),
 }));
 
 export const coursesRelations = relations(courses, ({ one, many }) => ({
@@ -913,6 +1095,7 @@ export const timingPointsRelations = relations(
 			references: [organizations.id],
 		}),
 		courseSplits: many(courseSplits),
+		staffAssignments: many(eventGroupStaffTimingPoints),
 	}),
 );
 
@@ -933,6 +1116,8 @@ export const courseSplitsRelations = relations(
 );
 
 export const peopleRelations = relations(people, ({ many, one }) => ({
+	user: one(users, { fields: [people.userId], references: [users.id] }),
+	staffAssignments: many(eventGroupStaff),
 	entrants: many(entrants, { relationName: "entrant" }),
 	emergencyContactForEntrants: many(entrants, {
 		relationName: "emergencyContact",
@@ -1023,6 +1208,10 @@ export const rawTimingEventsRelations = relations(
 			fields: [rawTimingEvents.eventGroupId],
 			references: [eventGroups.id],
 		}),
+		recordedBy: one(people, {
+			fields: [rawTimingEvents.recordedByPersonId],
+			references: [people.id],
+		}),
 		governedSplitTimes: many(scoredSplitTimes),
 	}),
 );
@@ -1055,6 +1244,10 @@ export const timeAllowancesRelations = relations(timeAllowances, ({ one }) => ({
 		fields: [timeAllowances.splitId],
 		references: [courseSplits.id],
 	}),
+	authorizedBy: one(people, {
+		fields: [timeAllowances.authorizedByPersonId],
+		references: [people.id],
+	}),
 }));
 
 export const splitTimeAuditsRelations = relations(
@@ -1063,6 +1256,10 @@ export const splitTimeAuditsRelations = relations(
 		splitTime: one(scoredSplitTimes, {
 			fields: [splitTimeAudits.splitTimeId],
 			references: [scoredSplitTimes.id],
+		}),
+		changedBy: one(people, {
+			fields: [splitTimeAudits.changedByPersonId],
+			references: [people.id],
 		}),
 	}),
 );
@@ -1091,6 +1288,12 @@ export type NewCourseSplit = InferInsertModel<typeof courseSplits>;
 
 export type Person = InferSelectModel<typeof people>;
 export type NewPerson = InferInsertModel<typeof people>;
+
+export type OrganizationMember = InferSelectModel<typeof organizationMembers>;
+
+export type StaffRole = (typeof staffRoleEnum.enumValues)[number];
+export type EventGroupStaff = InferSelectModel<typeof eventGroupStaff>;
+export type NewEventGroupStaff = InferInsertModel<typeof eventGroupStaff>;
 
 export type Entrant = InferSelectModel<typeof entrants>;
 export type NewEntrant = InferInsertModel<typeof entrants>;
