@@ -39,38 +39,31 @@ function Home() {
 
 	return (
 		<main class="page-wrap pb-24 pt-24">
-			<section class="mb-28">
-				<p class="page-label">Race timing &amp; live tracking</p>
-				<h1 class="page-title">Every checkpoint, accounted for.</h1>
-				<p class="page-sub">
-					Volunteers log times at the aid station, signal or not. Everyone else
-					follows along live.
-				</p>
-				<div class="flex flex-wrap gap-3">
-					<Button as="a" href="#live" size="lg">
-						Follow a live race
-					</Button>
-					<Button as={Link} to="/about" variant="outline" size="lg">
-						How it works
-					</Button>
-				</div>
-			</section>
-
-			<section id="live" class="mb-20 scroll-mt-28">
-				<SectionHeading title="Live now" />
-				<Show
-					when={data().live.length > 0}
-					fallback={
-						<Card class="p-6 text-sm text-muted-foreground">
-							No races on course right now.
-						</Card>
-					}
-				>
-					<div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-						<For each={data().live}>
-							{(group) => <LiveEventCard group={group} now={data().now} />}
-						</For>
+			<section
+				class="mb-28 grid grid-cols-1 gap-12 lg:items-center"
+				classList={{
+					"lg:grid-cols-[minmax(0,1fr)_420px]": data().live !== undefined,
+				}}
+			>
+				<div>
+					<p class="page-label">Race timing &amp; live tracking</p>
+					<h1 class="page-title">Every checkpoint, accounted for.</h1>
+					<p class="page-sub">
+						Volunteers log times at the aid station, signal or not. Everyone
+						else follows along live.
+					</p>
+					<div class="flex flex-wrap gap-3">
+						<Button as="a" href="#upcoming" size="lg">
+							Upcoming races
+						</Button>
+						<Button as={Link} to="/about" variant="outline" size="lg">
+							How it works
+						</Button>
 					</div>
+				</div>
+
+				<Show when={data().live}>
+					{(live) => <LiveEventCard group={live()} now={data().now} />}
 				</Show>
 			</section>
 

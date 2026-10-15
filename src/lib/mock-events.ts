@@ -2,46 +2,27 @@ import type { EventGroupSummary, LiveEventGroup } from "~/lib/events";
 
 const HOUR_MS = 3_600_000;
 
+// Flip to preview the hero without a race on course, the usual state.
+const SHOW_LIVE_RACE = true;
+
 // Stand-in until event groups are queried from the database; dates are
-// relative to `now` so the page always has something live and upcoming.
+// relative to `now` so the page always has something upcoming.
 export function getHomeEvents(now: Date) {
 	const at = (hours: number) => new Date(now.getTime() + hours * HOUR_MS);
 
-	const live: LiveEventGroup[] = [
-		{
-			slug: "bonneville-ridge-100",
-			name: "Bonneville Ridge 100",
-			location: "Kaysville, UT",
-			timeZone: "America/Denver",
-			discipline: "trail_ultra",
-			startDate: at(-14.4),
-			endDate: at(21.6),
-			timeLimitHours: 36,
-			onCourse: 241,
-		},
-		{
-			slug: "cedar-mesa-24",
-			name: "Cedar Mesa 24",
-			location: "Blanding, UT",
-			timeZone: "America/Denver",
-			discipline: "fixed_time_loop",
-			startDate: at(-9.2),
-			endDate: at(14.8),
-			timeLimitHours: 24,
-			onCourse: 86,
-		},
-		{
-			slug: "tamarack-gravel",
-			name: "Tamarack Gravel Grind",
-			location: "Donnelly, ID",
-			timeZone: "America/Boise",
-			discipline: "xco_cycling",
-			startDate: at(-3.1),
-			endDate: at(4.9),
-			timeLimitHours: 8,
-			onCourse: 171,
-		},
-	];
+	const live: LiveEventGroup | undefined = SHOW_LIVE_RACE
+		? {
+				slug: "bonneville-ridge-100",
+				name: "Bonneville Ridge 100",
+				location: "Kaysville, UT",
+				timeZone: "America/Denver",
+				discipline: "trail_ultra",
+				startDate: at(-14.4),
+				endDate: at(21.6),
+				timeLimitHours: 36,
+				onCourse: 241,
+			}
+		: undefined;
 
 	const upcoming: EventGroupSummary[] = [
 		{

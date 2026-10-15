@@ -11,18 +11,6 @@ import {
 	type LiveEventGroup,
 } from "~/lib/events";
 
-function LiveIndicator() {
-	return (
-		<span class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-clay">
-			<span class="relative flex size-2">
-				<span class="absolute inline-flex size-full animate-ping rounded-full bg-clay opacity-60" />
-				<span class="relative inline-flex size-2 rounded-full bg-clay" />
-			</span>
-			Live
-		</span>
-	);
-}
-
 export default function LiveEventCard(props: {
 	group: LiveEventGroup;
 	now: Date;
@@ -30,22 +18,30 @@ export default function LiveEventCard(props: {
 	const elapsed = () => elapsedHours(props.group, props.now);
 
 	return (
-		<Card class="flex flex-col gap-5 p-6">
-			<div class="flex items-center justify-between gap-3">
-				<LiveIndicator />
-				<span class="text-xs text-muted-foreground tabular-nums">
-					{props.group.onCourse} on course
+		<Card class="flex flex-col gap-6 border-clay/40 p-7">
+			<span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-clay">
+				<span class="relative flex size-2">
+					<span class="absolute inline-flex size-full animate-ping rounded-full bg-clay opacity-60" />
+					<span class="relative inline-flex size-2 rounded-full bg-clay" />
 				</span>
-			</div>
+				Live now
+			</span>
 
 			<div>
-				<h3 class="font-display m-0 text-2xl font-normal leading-tight text-foreground">
+				<h2 class="font-display m-0 text-3xl font-normal leading-tight text-foreground">
 					{props.group.name}
-				</h3>
+				</h2>
 				<p class="m-0 mt-1 text-sm text-muted-foreground">
 					{disciplineLabels[props.group.discipline]} · {props.group.location}
 				</p>
 			</div>
+
+			<p class="m-0 flex items-baseline gap-2">
+				<span class="font-display text-5xl leading-none tabular-nums text-foreground">
+					{props.group.onCourse}
+				</span>
+				<span class="text-sm text-muted-foreground">on course</span>
+			</p>
 
 			<Progress
 				value={Math.min(elapsed(), props.group.timeLimitHours)}
@@ -53,7 +49,7 @@ export default function LiveEventCard(props: {
 				getValueLabel={({ value, max }) =>
 					`${formatRaceClock(value * 3_600_000)} of ${formatRaceClock(max * 3_600_000)}`
 				}
-				class="mt-auto flex flex-col gap-2"
+				class="flex flex-col gap-2"
 			>
 				<div class="flex items-baseline justify-between gap-3">
 					<ProgressLabel class="text-xs font-normal text-muted-foreground">
