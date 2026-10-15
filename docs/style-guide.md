@@ -199,6 +199,10 @@ All application UI is built from genuine `solid-ui` components located in `src/c
 | `<Alert>` | `ui/alert.tsx` | `@kobalte/core/alert` | `Alert`, `AlertTitle`, `AlertDescription`. Variants: `default`, `destructive`, `warning` (clay), `info` (forest). |
 | `<Progress>` | `ui/progress.tsx` | `@kobalte/core/progress` | `Progress`, `ProgressLabel`, `ProgressValueLabel`. Hairline `bg-muted` track, forest fill. Label parts render Kobalte's own elements, not solid-ui's `<Label>`, since there is no control to label. |
 | `<NavigationMenu>` | `ui/navigation-menu.tsx` | `@kobalte/core/navigation-menu` | Accessible navigation suite for header menus and popovers. |
+| `<Tabs>` | `ui/tabs.tsx` | `@kobalte/core/tabs` | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `TabsIndicator`. Selected trigger gets the surface fill. |
+| `<Checkbox>` | `ui/checkbox.tsx` | `@kobalte/core/checkbox` | Children render as the Kobalte label. `rounded-sm` (4px) so it never reads as a radio. |
+| `<DropdownMenu>` | `ui/dropdown-menu.tsx` | `@kobalte/core/dropdown-menu` | Full solid-ui suite (items, labels, separators, sub-menus, checkbox/radio items). Used for the header user menu. |
+| `<FormSelect>` | `FormSelect.tsx` | `ui/select.tsx` | Labelled select over `{ value, label }` options for forms. |
 
 ### Nav Link Design Rationale
 Header navigation in `Header.tsx` preserves `.nav-link` with its sliding 1.5px forest underline transition (`::after`, `scaleX` 0→1) rather than stock button pills. This directly matches the starlink.com editorial design ethos established in ChekkPoint's foundations.
@@ -236,6 +240,8 @@ All transitions, animations, and smooth scroll behaviors automatically collapse 
 | `/manage-db` | Migrated to solid-ui `<Card>`, `<Table>`, `<Alert>`, `<Badge>`, `<Button>`, `<Input>` | Verified schema and live data views at 1440px & 390px |
 | `/redis` | Migrated to solid-ui `<Card>`, `<Alert>`, `<Badge>`, `<Button>`; added socket timeout (2s) | Verified at 1440px (graceful error banner when Redis is offline) |
 | `/hello` | Migrated to solid-ui `<Card>`, `<Input>`, `<Button>`, `<Badge>` | Verified SSR/client structure (Electric requires Docker) |
+| `/sign-in`, `/sign-up`, `/forgot-password`, `/reset-password` | Built on `<Card>`, `<Tabs>`, `<TextField>`, `<Alert>` | Verified at 1440px |
+| `/orgs`, `/orgs/$slug`, `/event-groups/$id`, `/account` | Built on `<Card>`, `<Table>`, `<Checkbox>`, `<FormSelect>`, `<Badge>` | Verified owner, director and volunteer views at 1440px; org page at 390px |
 
 ---
 

@@ -10,20 +10,40 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as HelloRouteImport } from './routes/hello'
 import { Route as ManageDbRouteImport } from './routes/manage-db'
 import { Route as RedisRouteImport } from './routes/redis'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as AuthedAccountRouteImport } from './routes/_authed/account'
+import { Route as AuthedAcceptInvitationInvitationIdRouteImport } from './routes/_authed/accept-invitation/$invitationId'
+import { Route as AuthedEventGroupsEventGroupIdRouteImport } from './routes/_authed/event-groups/$eventGroupId'
+import { Route as AuthedOrgsIndexRouteImport } from './routes/_authed/orgs/index'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiShapesHelloWorldRouteImport } from './routes/api/shapes/hello-world'
+import { Route as AuthedOrgsSlugIndexRouteImport } from './routes/_authed/orgs/$slug/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedRoute = AuthedRouteImport.update({
+  id: '/_authed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelloRoute = HelloRouteImport.update({
@@ -41,70 +61,185 @@ const RedisRoute = RedisRouteImport.update({
   path: '/redis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedAccountRoute = AuthedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAcceptInvitationInvitationIdRoute =
+  AuthedAcceptInvitationInvitationIdRouteImport.update({
+    id: '/accept-invitation/$invitationId',
+    path: '/accept-invitation/$invitationId',
+    getParentRoute: () => AuthedRoute,
+  } as any)
+const AuthedEventGroupsEventGroupIdRoute =
+  AuthedEventGroupsEventGroupIdRouteImport.update({
+    id: '/event-groups/$eventGroupId',
+    path: '/event-groups/$eventGroupId',
+    getParentRoute: () => AuthedRoute,
+  } as any)
+const AuthedOrgsIndexRoute = AuthedOrgsIndexRouteImport.update({
+  id: '/orgs/',
+  path: '/orgs/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiShapesHelloWorldRoute = ApiShapesHelloWorldRouteImport.update({
   id: '/api/shapes/hello-world',
   path: '/api/shapes/hello-world',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedOrgsSlugIndexRoute = AuthedOrgsSlugIndexRouteImport.update({
+  id: '/orgs/$slug/',
+  path: '/orgs/$slug/',
+  getParentRoute: () => AuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/hello': typeof HelloRoute
   '/manage-db': typeof ManageDbRoute
   '/redis': typeof RedisRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/account': typeof AuthedAccountRoute
+  '/accept-invitation/$invitationId': typeof AuthedAcceptInvitationInvitationIdRoute
+  '/event-groups/$eventGroupId': typeof AuthedEventGroupsEventGroupIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
+  '/orgs/': typeof AuthedOrgsIndexRoute
+  '/orgs/$slug/': typeof AuthedOrgsSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/hello': typeof HelloRoute
   '/manage-db': typeof ManageDbRoute
   '/redis': typeof RedisRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/account': typeof AuthedAccountRoute
+  '/accept-invitation/$invitationId': typeof AuthedAcceptInvitationInvitationIdRoute
+  '/event-groups/$eventGroupId': typeof AuthedEventGroupsEventGroupIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
+  '/orgs': typeof AuthedOrgsIndexRoute
+  '/orgs/$slug': typeof AuthedOrgsSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authed': typeof AuthedRouteWithChildren
   '/about': typeof AboutRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/hello': typeof HelloRoute
   '/manage-db': typeof ManageDbRoute
   '/redis': typeof RedisRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/_authed/account': typeof AuthedAccountRoute
+  '/_authed/accept-invitation/$invitationId': typeof AuthedAcceptInvitationInvitationIdRoute
+  '/_authed/event-groups/$eventGroupId': typeof AuthedEventGroupsEventGroupIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
+  '/_authed/orgs/': typeof AuthedOrgsIndexRoute
+  '/_authed/orgs/$slug/': typeof AuthedOrgsSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/forgot-password'
     | '/hello'
     | '/manage-db'
     | '/redis'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/account'
+    | '/accept-invitation/$invitationId'
+    | '/event-groups/$eventGroupId'
+    | '/api/auth/$'
     | '/api/shapes/hello-world'
+    | '/orgs/'
+    | '/orgs/$slug/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/forgot-password'
     | '/hello'
     | '/manage-db'
     | '/redis'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/account'
+    | '/accept-invitation/$invitationId'
+    | '/event-groups/$eventGroupId'
+    | '/api/auth/$'
     | '/api/shapes/hello-world'
+    | '/orgs'
+    | '/orgs/$slug'
   id:
     | '__root__'
     | '/'
+    | '/_authed'
     | '/about'
+    | '/forgot-password'
     | '/hello'
     | '/manage-db'
     | '/redis'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/_authed/account'
+    | '/_authed/accept-invitation/$invitationId'
+    | '/_authed/event-groups/$eventGroupId'
+    | '/api/auth/$'
     | '/api/shapes/hello-world'
+    | '/_authed/orgs/'
+    | '/_authed/orgs/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   HelloRoute: typeof HelloRoute
   ManageDbRoute: typeof ManageDbRoute
   RedisRoute: typeof RedisRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiShapesHelloWorldRoute: typeof ApiShapesHelloWorldRoute
 }
 
@@ -117,11 +252,25 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hello': {
@@ -145,6 +294,62 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof RedisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/account': {
+      id: '/_authed/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthedAccountRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/accept-invitation/$invitationId': {
+      id: '/_authed/accept-invitation/$invitationId'
+      path: '/accept-invitation/$invitationId'
+      fullPath: '/accept-invitation/$invitationId'
+      preLoaderRoute: typeof AuthedAcceptInvitationInvitationIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/event-groups/$eventGroupId': {
+      id: '/_authed/event-groups/$eventGroupId'
+      path: '/event-groups/$eventGroupId'
+      fullPath: '/event-groups/$eventGroupId'
+      preLoaderRoute: typeof AuthedEventGroupsEventGroupIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/orgs/': {
+      id: '/_authed/orgs/'
+      path: '/orgs'
+      fullPath: '/orgs/'
+      preLoaderRoute: typeof AuthedOrgsIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/shapes/hello-world': {
       id: '/api/shapes/hello-world'
       path: '/api/shapes/hello-world'
@@ -152,15 +357,48 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof ApiShapesHelloWorldRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/orgs/$slug/': {
+      id: '/_authed/orgs/$slug/'
+      path: '/orgs/$slug'
+      fullPath: '/orgs/$slug/'
+      preLoaderRoute: typeof AuthedOrgsSlugIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
+interface AuthedRouteChildren {
+  AuthedAccountRoute: typeof AuthedAccountRoute
+  AuthedAcceptInvitationInvitationIdRoute: typeof AuthedAcceptInvitationInvitationIdRoute
+  AuthedEventGroupsEventGroupIdRoute: typeof AuthedEventGroupsEventGroupIdRoute
+  AuthedOrgsIndexRoute: typeof AuthedOrgsIndexRoute
+  AuthedOrgsSlugIndexRoute: typeof AuthedOrgsSlugIndexRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedAccountRoute: AuthedAccountRoute,
+  AuthedAcceptInvitationInvitationIdRoute:
+    AuthedAcceptInvitationInvitationIdRoute,
+  AuthedEventGroupsEventGroupIdRoute: AuthedEventGroupsEventGroupIdRoute,
+  AuthedOrgsIndexRoute: AuthedOrgsIndexRoute,
+  AuthedOrgsSlugIndexRoute: AuthedOrgsSlugIndexRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthedRoute: AuthedRouteWithChildren,
   AboutRoute: AboutRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   HelloRoute: HelloRoute,
   ManageDbRoute: ManageDbRoute,
   RedisRoute: RedisRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignInRoute: SignInRoute,
+  SignUpRoute: SignUpRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiShapesHelloWorldRoute: ApiShapesHelloWorldRoute,
 }
 export const routeTree = rootRouteImport

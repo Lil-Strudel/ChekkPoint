@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/solid-router";
+import UserMenu from "./UserMenu";
 
 export default function Header() {
 	return (
@@ -17,9 +18,11 @@ export default function Header() {
 					</Link>
 				</h2>
 
-				<div class="ml-auto flex items-center gap-2"></div>
+				<div class="ml-auto flex items-center gap-2 sm:order-3 sm:ml-0">
+					<UserMenu />
+				</div>
 
-				<div class="order-3 flex w-full flex-wrap items-center gap-y-2.5 sm:gap-x-3 md:gap-x-4 pb-1 text-sm font-semibold sm:order-2 sm:w-auto md:flex-nowrap sm:pb-0">
+				<div class="order-3 flex w-full flex-wrap items-center gap-y-2.5 sm:gap-x-3 md:gap-x-4 pb-1 text-sm font-semibold sm:order-2 sm:ml-auto sm:w-auto md:flex-nowrap sm:pb-0">
 					<Link
 						to="/"
 						class="nav-link"
