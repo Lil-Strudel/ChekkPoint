@@ -1,5 +1,6 @@
 {
   "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", ".claude"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "preserve",
@@ -20,6 +21,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   }
 }

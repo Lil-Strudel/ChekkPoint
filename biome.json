@@ -13,7 +13,8 @@
 			"**/index.html",
 			"**/vite.config.ts",
 			"**/drizzle.config.ts",
-			"!**/src/routeTree.gen.ts"
+			"!**/src/routeTree.gen.ts",
+			"!**/.claude"
 		]
 	},
 	"formatter": {
@@ -25,6 +26,11 @@
 		"enabled": true,
 		"rules": {
 			"preset": "recommended"
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
 		}
 	},
 	"javascript": {
