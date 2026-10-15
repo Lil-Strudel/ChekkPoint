@@ -12,13 +12,15 @@ pnpm dev
 
 ## Local services
 
-Postgres, Redis and Electric run in Docker via `compose.yaml`, using the credentials in `.env.example`. `pnpm dev` starts them automatically (and waits until they're healthy). They keep running after the dev server stops, so the next start is fast.
+Postgres, Redis, Electric and Mailpit run in Docker via `compose.yaml`, using the credentials in `.env.example`. `pnpm dev` starts them automatically (and waits until they're healthy). They keep running after the dev server stops, so the next start is fast.
 
 Postgres runs with `wal_level=logical` so [Electric](https://electric-sql.com) can stream changes. Electric listens on `localhost:3001`; the browser never talks to it directly, only through the app's shape proxy (`src/electric/proxy.ts`).
 
+Auth emails (verification, password reset, sign-in codes, magic links, invitations) go to [Mailpit](https://mailpit.axllent.org) over SMTP on `localhost:1025`; read them at http://localhost:8025. If `SMTP_URL` is unset, emails are printed to the server log instead.
+
 ```bash
 pnpm db:migrate      # apply migrations (services must be up)
-pnpm services:up     # start Postgres, Redis + Electric without the dev server
+pnpm services:up     # start Postgres, Redis, Electric + Mailpit without the dev server
 pnpm services:down   # stop them (data is kept)
 pnpm services:reset  # wipe all data and start fresh
 pnpm services:logs   # follow container logs

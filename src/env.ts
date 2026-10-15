@@ -10,6 +10,8 @@ export const env = createEnv({
 		ELECTRIC_SECRET: z.string().optional(),
 		BETTER_AUTH_SECRET: z.string().min(32),
 		BETTER_AUTH_URL: z.url(),
+		SMTP_URL: z.url().optional(),
+		EMAIL_FROM: z.string().default("ChekkPoint <no-reply@chekkpoint.local>"),
 		GOOGLE_CLIENT_ID: z.string().optional(),
 		GOOGLE_CLIENT_SECRET: z.string().optional(),
 		STRAVA_CLIENT_ID: z.string().optional(),
