@@ -32,9 +32,16 @@ To build this application for production:
 pnpm build
 ```
 
-## Styling
+## UI Components & Styling
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+This project uses [Tailwind CSS](https://tailwindcss.com/) for styling and standardizes on [solid-ui](https://www.solid-ui.com/docs/introduction) (an accessible, customizable SolidJS port of shadcn/ui built on Kobalte primitives) for UI components.
+
+### Component Sourcing Policy (solid-ui First)
+
+Whenever adding or refactoring UI components:
+1. Always check [solid-ui documentation](https://www.solid-ui.com/docs/introduction).
+2. If an existing solid-ui component exists (buttons, dialogs, dropdowns, inputs, sheets, tables, tabs, etc.), use the solid-ui component instead of building custom markup from scratch.
+3. Ensure components leverage Kobalte accessibility primitives and Tailwind CSS styling tokens.
 
 ### Removing Tailwind CSS
 

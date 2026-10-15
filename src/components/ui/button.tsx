@@ -1,32 +1,36 @@
 import * as ButtonPrimitive from "@kobalte/core/button";
 import type { PolymorphicProps } from "@kobalte/core/polymorphic";
-import type { VariantProps } from "class-variance-authority";
-import { cva } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 import type { JSX, ValidComponent } from "solid-js";
 import { splitProps } from "solid-js";
-
 import { cn } from "~/lib/utils";
 
-const buttonVariants = cva(
-	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+export const buttonVariants = cva(
+	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all focus-visible:outline-hidden focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
 	{
 		variants: {
 			variant: {
-				default: "bg-primary text-primary-foreground hover:bg-primary/90",
+				default:
+					"bg-primary text-primary-foreground hover:bg-forest-deep active:bg-forest-deep/90 shadow-xs",
 				destructive:
-					"bg-destructive text-destructive-foreground hover:bg-destructive/90",
+					"bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-xs",
 				outline:
-					"border border-input hover:bg-accent hover:text-accent-foreground",
+					"border border-border bg-background/60 text-foreground hover:bg-accent hover:text-accent-foreground backdrop-blur-xs shadow-xs",
 				secondary:
-					"bg-secondary text-secondary-foreground hover:bg-secondary/80",
-				ghost: "hover:bg-accent hover:text-accent-foreground",
+					"bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border shadow-xs",
+				ghost:
+					"hover:bg-accent hover:text-accent-foreground text-muted-foreground hover:text-foreground",
 				link: "text-primary underline-offset-4 hover:underline",
+				pill: "rounded-full bg-primary text-primary-foreground hover:bg-forest-deep shadow-xs",
+				telemetry:
+					"bg-card text-primary border border-primary/30 hover:bg-primary/10 font-sans tabular-nums text-xs tracking-wider uppercase",
 			},
 			size: {
-				default: "h-10 px-4 py-2",
-				sm: "h-9 px-3 text-xs",
-				lg: "h-11 px-8",
-				icon: "size-10",
+				default: "h-9 px-4 py-2",
+				sm: "h-8 rounded-lg px-3 text-xs",
+				lg: "h-11 rounded-xl px-8 text-base",
+				icon: "h-9 w-9 p-0",
+				pill: "h-9 rounded-full px-5 text-sm",
 			},
 		},
 		defaultVariants: {
@@ -36,21 +40,22 @@ const buttonVariants = cva(
 	},
 );
 
-type ButtonProps<T extends ValidComponent = "button"> =
+export type ButtonProps<T extends ValidComponent = "button"> =
 	ButtonPrimitive.ButtonRootProps<T> &
 		VariantProps<typeof buttonVariants> & {
 			class?: string | undefined;
 			children?: JSX.Element;
 		};
 
-const Button = <T extends ValidComponent = "button">(
+export const Button = <T extends ValidComponent = "button">(
 	props: PolymorphicProps<T, ButtonProps<T>>,
 ) => {
 	const [local, others] = splitProps(props as ButtonProps, [
+		"class",
 		"variant",
 		"size",
-		"class",
 	]);
+
 	return (
 		<ButtonPrimitive.Root
 			class={cn(
@@ -62,5 +67,4 @@ const Button = <T extends ValidComponent = "button">(
 	);
 };
 
-export type { ButtonProps };
-export { Button, buttonVariants };
+export type { ButtonProps as ButtonComponentProps };

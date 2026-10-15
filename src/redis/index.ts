@@ -2,9 +2,16 @@ import "@tanstack/solid-start/server-only";
 import { createClient } from "redis";
 import { env } from "../env";
 
-const client = createClient({ url: env.REDIS_URL }).on("error", (err) =>
-	console.error("Redis Client Error", err),
-);
+const client = createClient({
+	url: env.REDIS_URL,
+	socket: {
+		connectTimeout: 1500,
+		reconnectStrategy: (retries) => {
+			if (retries > 0) return false;
+			return 200;
+		},
+	},
+}).on("error", (err) => console.error("Redis Client Error", err));
 
 let connecting: Promise<typeof client> | undefined;
 

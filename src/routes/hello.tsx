@@ -10,6 +10,10 @@ import {
 	onMount,
 	Show,
 } from "solid-js";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/card";
+import { Input } from "../components/ui/input";
 import { getHelloDb, type HelloDb } from "../db/collections/hello";
 import type { HelloRow as HelloRowData } from "../db/hello.shared";
 
@@ -42,38 +46,35 @@ function HelloPage() {
 	};
 
 	return (
-		<main class="page-wrap px-4 pb-8 pt-14">
-			<section class="island-shell rounded-2xl p-6">
-				<p class="island-kicker mb-2">TanStack DB + Electric</p>
-				<h1 class="mb-2 text-2xl font-bold text-[var(--sea-ink)]">
-					Hello World table
-				</h1>
+		<main class="page-wrap pb-24 pt-16">
+			<p class="page-label">TanStack DB + Electric</p>
+			<h1 class="page-title">Hello World table</h1>
+			<p class="page-sub">Local-first rows synced live through Electric.</p>
+			<Card class="p-6">
 				<SyncStatus helloDb={helloDb()} synced={query.isReady} />
 
 				<form class="mb-6 flex gap-2" onSubmit={add}>
-					<input
-						class="flex-1 rounded-lg border px-3 py-2"
+					<Input
+						class="flex-1"
 						placeholder="hello world"
 						maxLength={255}
 						value={draft()}
 						onInput={(e) => setDraft(e.currentTarget.value)}
 					/>
-					<button
+					<Button
 						type="submit"
-						class="rounded-lg border px-4 py-2 font-semibold"
+						class="px-5 font-semibold"
 						disabled={!draft().trim()}
 					>
 						Add
-					</button>
+					</Button>
 				</form>
 
 				<Show
 					when={rows().length > 0}
-					fallback={
-						<p class="text-sm text-[var(--sea-ink-soft)]">No rows yet.</p>
-					}
+					fallback={<p class="text-sm text-muted-foreground">No rows yet.</p>}
 				>
-					<ul class="m-0 list-none space-y-2 p-0">
+					<ul class="m-0 list-none p-0 divide-y divide-border/60">
 						<For each={rows()}>
 							{(row) => (
 								<HelloRow
@@ -86,7 +87,7 @@ function HelloPage() {
 						</For>
 					</ul>
 				</Show>
-			</section>
+			</Card>
 		</main>
 	);
 }
@@ -111,21 +112,23 @@ function SyncStatus(props: { helloDb: HelloDb; synced: boolean }) {
 	});
 
 	return (
-		<p class="mb-4 flex flex-wrap gap-x-4 text-xs text-[var(--sea-ink-soft)]">
-			<span class={online() ? "text-green-600" : "text-red-600"}>
+		<div class="mb-5 flex flex-wrap items-center gap-2 text-xs">
+			<Badge variant={online() ? "forest" : "clay"}>
 				{online() ? "Online" : "Offline"}
-			</span>
-			<span>{props.synced ? "Live" : "Syncing…"}</span>
-			<span>{pending()} pending write(s)</span>
-			<span>
+			</Badge>
+			<Badge variant={props.synced ? "forest" : "secondary"}>
+				{props.synced ? "Live" : "Syncing…"}
+			</Badge>
+			<Badge variant="chip">{pending()} pending write(s)</Badge>
+			<Badge variant="outline">
 				{props.helloDb.persisted
 					? "Stored in OPFS"
 					: "Memory only (OPFS unavailable)"}
-			</span>
+			</Badge>
 			<Show when={props.helloDb.executor.mode === "online-only"}>
-				<span class="text-red-600">Outbox storage unavailable</span>
+				<Badge variant="clay">Outbox storage unavailable</Badge>
 			</Show>
-		</p>
+		</div>
 	);
 }
 
@@ -143,22 +146,24 @@ function HelloRow(props: {
 	};
 
 	return (
-		<li>
-			<form class="flex items-center gap-2" onSubmit={save}>
-				<input
-					class="flex-1 rounded-lg border px-3 py-1.5"
+		<li class="py-3">
+			<form class="flex w-full items-center gap-2" onSubmit={save}>
+				<Input
+					class="flex-1"
 					maxLength={255}
 					value={message()}
 					onInput={(e) => setMessage(e.currentTarget.value)}
 				/>
-				<button
+				<Button
 					type="submit"
-					class="rounded-lg border px-3 py-1.5 text-sm font-semibold"
+					variant="secondary"
+					size="sm"
+					class="font-semibold"
 					disabled={!message().trim() || message() === props.row.message}
 				>
 					Save
-				</button>
-				<span class="text-xs text-[var(--sea-ink-soft)]">
+				</Button>
+				<span class="text-xs text-muted-foreground whitespace-nowrap">
 					updated {new Date(props.row.updatedAt).toLocaleString()}
 				</span>
 			</form>

@@ -1,6 +1,10 @@
 import { createFileRoute, useRouter } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import { Show } from "solid-js";
+import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/card";
 import { getRedis } from "../redis";
 
 const HITS_KEY = "chekkpoint:redis-check:hits";
@@ -33,46 +37,49 @@ function RedisPage() {
 	const result = Route.useLoaderData();
 
 	return (
-		<main class="page-wrap px-4 pb-8 pt-14">
-			<section class="island-shell rounded-2xl p-6">
-				<p class="island-kicker mb-2">node-redis</p>
-				<h1 class="mb-4 text-2xl font-bold text-[var(--sea-ink)]">
-					Redis connection check
-				</h1>
-
+		<main class="page-wrap pb-24 pt-16">
+			<p class="page-label">node-redis</p>
+			<h1 class="page-title">Redis connection check</h1>
+			<p class="page-sub">Live PING, latency and server version.</p>
+			<Card class="p-6">
 				<Show
 					when={result().ok && result()}
 					fallback={
-						<p class="mb-4 font-semibold text-red-600">
-							Not connected:{" "}
-							{(result() as { error?: string }).error ?? "unknown error"}
-						</p>
+						<Alert variant="destructive" class="mb-5">
+							<AlertTitle>Not connected to Redis</AlertTitle>
+							<AlertDescription>
+								{(result() as { error?: string }).error ?? "unknown error"}
+							</AlertDescription>
+						</Alert>
 					}
 				>
 					{(r) => (
-						<dl class="mb-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-							<dt class="font-semibold">Status</dt>
-							<dd class="m-0 font-semibold text-green-600">Connected</dd>
-							<dt class="font-semibold">PING</dt>
+						<dl class="mb-5 grid grid-cols-[auto_1fr] items-center gap-x-6 gap-y-3 text-sm">
+							<dt class="font-semibold text-foreground">Status</dt>
 							<dd class="m-0">
+								<Badge variant="forest">Connected</Badge>
+							</dd>
+							<dt class="font-semibold text-foreground">PING</dt>
+							<dd class="m-0 text-muted-foreground font-mono">
 								{r().pong} ({r().latencyMs} ms)
 							</dd>
-							<dt class="font-semibold">Server version</dt>
-							<dd class="m-0">{r().version}</dd>
-							<dt class="font-semibold">Page checks (INCR)</dt>
-							<dd class="m-0">{r().hits}</dd>
+							<dt class="font-semibold text-foreground">Server version</dt>
+							<dd class="m-0 text-muted-foreground font-mono">{r().version}</dd>
+							<dt class="font-semibold text-foreground">Page checks (INCR)</dt>
+							<dd class="m-0 text-muted-foreground font-mono">{r().hits}</dd>
 						</dl>
 					)}
 				</Show>
 
-				<button
+				<Button
 					type="button"
-					class="rounded-lg border px-4 py-2 font-semibold"
+					variant="outline"
+					class="font-semibold"
 					onClick={() => router.invalidate()}
 				>
 					Check again
-				</button>
-			</section>
+				</Button>
+			</Card>
 		</main>
 	);
 }

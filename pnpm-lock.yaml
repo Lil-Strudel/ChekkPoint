@@ -11,6 +11,12 @@ importers:
       '@electric-sql/client':
         specifier: ^1.5.28
         version: 1.5.28
+      '@fontsource/eb-garamond':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/manrope':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@journeyapps/wa-sqlite':
         specifier: ^1.7.2
         version: 1.7.2
@@ -32,6 +38,9 @@ importers:
       '@tanstack/electric-db-collection':
         specifier: ^0.4.10
         version: 0.4.10(typescript@7.0.2)
+      '@tanstack/history':
+        specifier: ^1.162.5
+        version: 1.162.5
       '@tanstack/offline-transactions':
         specifier: ^1.0.56
         version: 1.0.56(typescript@7.0.2)
@@ -43,7 +52,7 @@ importers:
         version: 1.170.41(solid-js@1.9.15)
       '@tanstack/solid-router-devtools':
         specifier: latest
-        version: 1.167.2(@tanstack/router-core@1.171.37)(@tanstack/solid-router@1.170.41(solid-js@1.9.15))(csstype@3.2.3)(solid-js@1.9.15)
+        version: 1.167.2(@tanstack/router-core@1.171.32)(@tanstack/solid-router@1.170.41(solid-js@1.9.15))(csstype@3.2.3)(solid-js@1.9.15)
       '@tanstack/solid-start':
         specifier: latest
         version: 1.169.1(rolldown@1.2.9)(solid-js@1.9.15)(vite-plugin-solid@2.11.14(solid-js@1.9.15)(vite@8.3.0(@types/node@26.6.2)(jiti@2.7.0)))(vite@8.3.0(@types/node@26.6.2)(jiti@2.7.0))
@@ -437,6 +446,12 @@ packages:
 
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
+
+  '@fontsource/eb-garamond@5.3.0':
+    resolution: {integrity: sha512-VplwHpB8FLuzl+4G5LDci1b3Z4SghiuXH8XEgaxjnOb5aue5mEt1njmDKeO6iyLeGa73LffU7PC7hzncLRx0ZA==}
+
+  '@fontsource/manrope@5.3.0':
+    resolution: {integrity: sha512-obJ1Dv3+uCA6HlHgW8u4BGYxJR9In2HW7gjJhlflEvkrj1X1iSEwu0fToL+JYGC/FEKFfIz1sBuPduvcL2gIAA==}
 
   '@internationalized/number@3.6.9':
     resolution: {integrity: sha512-GgWy2caO/+hV9sT/oCTWGHvbjmJMPT9kkXzoKRLnkEq7adghhR7UprhvY9sXrKfrp3NcDfhF6QQHXR1KfQbB8g==}
@@ -2514,6 +2529,10 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
+  '@fontsource/eb-garamond@5.3.0': {}
+
+  '@fontsource/manrope@5.3.0': {}
+
   '@internationalized/number@3.6.9':
     dependencies:
       '@swc/helpers': 0.5.23
@@ -2987,9 +3006,9 @@ snapshots:
       seroval: 1.6.7
       seroval-plugins: 1.6.7(seroval@1.6.7)
 
-  '@tanstack/router-devtools-core@1.168.2(@tanstack/router-core@1.171.37)(csstype@3.2.3)':
+  '@tanstack/router-devtools-core@1.168.2(@tanstack/router-core@1.171.32)(csstype@3.2.3)':
     dependencies:
-      '@tanstack/router-core': 1.171.37
+      '@tanstack/router-core': 1.171.32
       clsx: 2.1.1
       goober: 2.1.19(csstype@3.2.3)
     optionalDependencies:
@@ -3066,13 +3085,13 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@tanstack/solid-router-devtools@1.167.2(@tanstack/router-core@1.171.37)(@tanstack/solid-router@1.170.41(solid-js@1.9.15))(csstype@3.2.3)(solid-js@1.9.15)':
+  '@tanstack/solid-router-devtools@1.167.2(@tanstack/router-core@1.171.32)(@tanstack/solid-router@1.170.41(solid-js@1.9.15))(csstype@3.2.3)(solid-js@1.9.15)':
     dependencies:
-      '@tanstack/router-devtools-core': 1.168.2(@tanstack/router-core@1.171.37)(csstype@3.2.3)
+      '@tanstack/router-devtools-core': 1.168.2(@tanstack/router-core@1.171.32)(csstype@3.2.3)
       '@tanstack/solid-router': 1.170.41(solid-js@1.9.15)
       solid-js: 1.9.15
     optionalDependencies:
-      '@tanstack/router-core': 1.171.37
+      '@tanstack/router-core': 1.171.32
     transitivePeerDependencies:
       - csstype
 

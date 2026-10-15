@@ -4,10 +4,16 @@ export default function Header() {
 	return (
 		<header class="site-header px-4">
 			<nav class="page-wrap nav-shell">
-				<h2 class="m-0 flex-shrink-0 text-base font-semibold tracking-tight">
+				<h2 class="m-0 flex-shrink-0">
 					<Link to="/" class="brand-pill">
-						<span class="brand-dot" />
-						TanStack Start
+						<svg class="brand-mark" viewBox="0 0 38 30" aria-hidden="true">
+							<path
+								d="M0 30 L13 6 L21 20 L26 12 L38 30 Z"
+								fill="currentColor"
+							/>
+							<circle cx="22" cy="4" r="3" fill="var(--clay)" />
+						</svg>
+						ChekkPoint
 					</Link>
 				</h2>
 
@@ -36,27 +42,12 @@ export default function Header() {
 						Hello DB
 					</Link>
 					<Link
-						to="/redis"
-						class="nav-link"
-						activeProps={{ class: "nav-link is-active" }}
-					>
-						Redis
-					</Link>
-					<Link
 						to="/manage-db"
 						class="nav-link"
 						activeProps={{ class: "nav-link is-active" }}
 					>
 						Manage DB
 					</Link>
-					<a
-						href="https://tanstack.com/start/latest/docs/framework/solid/overview"
-						target="_blank"
-						rel="noreferrer"
-						class="nav-link"
-					>
-						Docs
-					</a>
 				</div>
 			</nav>
 		</header>
