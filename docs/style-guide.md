@@ -180,6 +180,7 @@ All application UI is built from genuine `solid-ui` components located in `src/c
 | `<Select>` | `ui/select.tsx` | `@kobalte/core/select` | `Select`, `SelectTrigger`, `SelectValue`, `SelectContent`, `SelectItem`, `SelectLabel`, `SelectDescription`. |
 | `<Table>` | `ui/table.tsx` | Native container | `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`. Built-in responsive scroll container and hover states. |
 | `<Alert>` | `ui/alert.tsx` | `@kobalte/core/alert` | `Alert`, `AlertTitle`, `AlertDescription`. Variants: `default`, `destructive`, `warning` (clay), `info` (forest). |
+| `<Progress>` | `ui/progress.tsx` | `@kobalte/core/progress` | `Progress`, `ProgressLabel`, `ProgressValueLabel`. Hairline `bg-muted` track, forest fill. Label parts render Kobalte's own elements, not solid-ui's `<Label>`, since there is no control to label. |
 | `<NavigationMenu>` | `ui/navigation-menu.tsx` | `@kobalte/core/navigation-menu` | Accessible navigation suite for header menus and popovers. |
 
 ### Nav Link Design Rationale
@@ -213,7 +214,7 @@ All transitions, animations, and smooth scroll behaviors automatically collapse 
 
 | Route | State | Verification |
 |---|---|---|
-| `/` (index) | Migrated to solid-ui `<Card>` + semantic tokens | Verified at 1440px & 390px |
+| `/` (index) | Hero: intro, "Right now" summary, live event cards (`LiveEventCard`), upcoming list (`UpcomingEventRow`), how it works. Mock data from `src/lib/mock-events.ts` via the route loader | Verified at 1440px & 390px |
 | `/about` | Migrated to solid-ui `<Card>` + semantic tokens | Verified at 1440px & 390px |
 | `/manage-db` | Migrated to solid-ui `<Card>`, `<Table>`, `<Alert>`, `<Badge>`, `<Button>`, `<Input>` | Verified schema and live data views at 1440px & 390px |
 | `/redis` | Migrated to solid-ui `<Card>`, `<Alert>`, `<Badge>`, `<Button>`; added socket timeout (2s) | Verified at 1440px (graceful error banner when Redis is offline) |
