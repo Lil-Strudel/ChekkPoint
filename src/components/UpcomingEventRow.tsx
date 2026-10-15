@@ -1,5 +1,3 @@
-import { For } from "solid-js";
-import { Badge } from "~/components/ui/badge";
 import {
 	dateParts,
 	disciplineLabels,
@@ -25,39 +23,20 @@ export default function UpcomingEventRow(props: {
 				<span class="font-display text-3xl leading-none tabular-nums text-foreground">
 					{start().day}
 				</span>
-				<span class="mt-0.5 text-xs text-muted-foreground">
-					{start().weekday}
-				</span>
 			</time>
 
 			<div class="min-w-0 flex-1">
-				<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-					<h3 class="font-display m-0 text-xl font-normal text-foreground">
-						{props.group.name}
-					</h3>
-					<span class="text-xs text-muted-foreground">
-						{formatStartsIn(props.group.startDate, props.now)}
-					</span>
-				</div>
+				<h3 class="font-display m-0 text-xl font-normal text-foreground">
+					{props.group.name}
+				</h3>
 				<p class="m-0 mt-0.5 text-sm text-muted-foreground">
-					{props.group.organization} · {props.group.location}
+					{disciplineLabels[props.group.discipline]} · {props.group.location}
 				</p>
-				<div class="mt-2 flex flex-wrap gap-1.5">
-					<Badge variant="chip">
-						{disciplineLabels[props.group.discipline]}
-					</Badge>
-					<For each={props.group.races}>
-						{(race) => <Badge variant="outline">{race}</Badge>}
-					</For>
-				</div>
 			</div>
 
-			<div class="hidden shrink-0 text-right sm:block">
-				<p class="font-display m-0 text-2xl leading-none tabular-nums text-foreground">
-					{props.group.entrants.toLocaleString("en-US")}
-				</p>
-				<p class="m-0 mt-1 text-xs text-muted-foreground">entrants</p>
-			</div>
+			<span class="hidden shrink-0 text-sm text-muted-foreground sm:block">
+				{formatStartsIn(props.group.startDate, props.now)}
+			</span>
 		</li>
 	);
 }

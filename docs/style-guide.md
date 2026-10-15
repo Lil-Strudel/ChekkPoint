@@ -214,7 +214,7 @@ All transitions, animations, and smooth scroll behaviors automatically collapse 
 
 | Route | State | Verification |
 |---|---|---|
-| `/` (index) | Hero: intro, "Right now" summary, live event cards (`LiveEventCard`), upcoming list (`UpcomingEventRow`), how it works. Mock data from `src/lib/mock-events.ts` via the route loader | Verified at 1440px & 390px |
+| `/` (index) | Hero intro, live event cards (`LiveEventCard`), upcoming list (`UpcomingEventRow`), how it works. Mock data from `src/lib/mock-events.ts` via the route loader | Verified at 1440px & 390px |
 | `/about` | Migrated to solid-ui `<Card>` + semantic tokens | Verified at 1440px & 390px |
 | `/manage-db` | Migrated to solid-ui `<Card>`, `<Table>`, `<Alert>`, `<Badge>`, `<Button>`, `<Input>` | Verified schema and live data views at 1440px & 390px |
 | `/redis` | Migrated to solid-ui `<Card>`, `<Alert>`, `<Badge>`, `<Button>`; added socket timeout (2s) | Verified at 1440px (graceful error banner when Redis is offline) |
