@@ -15,12 +15,14 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
+    "auth:make-admin": "node --env-file-if-exists=.env scripts/make-admin.mjs",
     "services:up": "docker compose up -d --wait",
     "services:down": "docker compose down",
     "services:reset": "docker compose down -v && docker compose up -d --wait",
     "services:logs": "docker compose logs -f"
   },
   "dependencies": {
+    "@better-auth/passkey": "^1.7.7",
     "@electric-sql/client": "^1.5.28",
     "@fontsource/eb-garamond": "^5.3.0",
     "@fontsource/manrope": "^5.3.0",
@@ -37,6 +39,7 @@
     "@tanstack/solid-router": "latest",
     "@tanstack/solid-router-devtools": "latest",
     "@tanstack/solid-start": "latest",
+    "better-auth": "^1.7.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "1.0.0-rc.4",
