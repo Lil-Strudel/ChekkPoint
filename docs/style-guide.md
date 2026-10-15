@@ -241,7 +241,9 @@ All transitions, animations, and smooth scroll behaviors automatically collapse 
 | `/redis` | Migrated to solid-ui `<Card>`, `<Alert>`, `<Badge>`, `<Button>`; added socket timeout (2s) | Verified at 1440px (graceful error banner when Redis is offline) |
 | `/hello` | Migrated to solid-ui `<Card>`, `<Input>`, `<Button>`, `<Badge>` | Verified SSR/client structure (Electric requires Docker) |
 | `/sign-in`, `/sign-up`, `/forgot-password`, `/reset-password` | Built on `<Card>`, `<Tabs>`, `<TextField>`, `<Alert>` | Verified at 1440px |
-| `/orgs`, `/orgs/$slug`, `/event-groups/$id`, `/account` | Built on `<Card>`, `<Table>`, `<Checkbox>`, `<FormSelect>`, `<Badge>` | Verified owner, director and volunteer views at 1440px; org page at 390px |
+| `/event-groups/$id`, `/account` | Built on `<Card>`, `<Table>`, `<Checkbox>`, `<FormSelect>`, `<Badge>` | Verified owner, director and volunteer views at 1440px |
+| `/orgs`, `/orgs/new` | Org cards, staffing, and the create form (`OrgForm` on `<TextField>`, slug follows the name until edited) | Verified at 1440px; create, taken and reserved slugs scripted end to end |
+| `/orgs/$slug/*` | Org workspace: `.nav-link` sub-nav (wraps on mobile) over Overview, Event groups, Events, Courses, Timing points, Members, Settings; `OrgSection`, `EmptyState`, `DateBlock`, `<Table>`, `<Badge>` | Verified owner and timing-steward views at 1440px, sub-nav at 390px |
 
 ---
 

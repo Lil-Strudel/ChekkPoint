@@ -2,6 +2,7 @@ import "@tanstack/solid-start/server-only";
 import { passkey } from "@better-auth/passkey";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError } from "better-auth/api";
 import {
 	admin,
 	emailOTP,
@@ -23,11 +24,27 @@ import {
 	verifications,
 } from "../db/schema";
 import { env } from "../env";
+import { organizationInput } from "../orgs/orgs.shared";
 import { ac, roles } from "./access";
 import { sendEmail } from "./email.server";
 import { ensurePersonForUser } from "./people.server";
 
 const DAY = 60 * 60 * 24;
+
+// The client validates too, but the organization endpoints are public API.
+function assertValidOrganization(organization: {
+	name?: string;
+	slug?: string;
+}) {
+	const result = organizationInput
+		.partial()
+		.safeParse({ name: organization.name, slug: organization.slug });
+	if (!result.success) {
+		throw new APIError("BAD_REQUEST", {
+			message: result.error.issues[0].message,
+		});
+	}
+}
 
 type StravaAthlete = {
 	id: number;
@@ -173,6 +190,14 @@ export const auth = betterAuth({
 			ac,
 			roles,
 			allowUserToCreateOrganization: true,
+			organizationHooks: {
+				async beforeCreateOrganization({ organization }) {
+					assertValidOrganization(organization);
+				},
+				async beforeUpdateOrganization({ organization }) {
+					assertValidOrganization(organization);
+				},
+			},
 			async sendInvitationEmail({ id, email, organization, inviter, role }) {
 				await sendEmail({
 					to: email,

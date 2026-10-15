@@ -10,24 +10,16 @@ import {
 	TableHeader,
 	TableRow,
 } from "~/components/ui/table";
-import { formatDateTime } from "~/lib/organizations";
+import { formatStart } from "~/orgs/format";
 
-export const Route = createFileRoute("/orgs/$orgSlug/events")({
+export const Route = createFileRoute("/_authed/orgs/$slug/events")({
 	component: Events,
 });
 
-const orgRoute = getRouteApi("/orgs/$orgSlug");
+const orgRoute = getRouteApi("/_authed/orgs/$slug");
 
 function Events() {
 	const data = orgRoute.useLoaderData();
-	const params = orgRoute.useParams();
-
-	const events = () =>
-		data()
-			.org.eventGroups.flatMap((group) =>
-				group.events.map((event) => ({ ...event, group })),
-			)
-			.sort((a, b) => b.scheduledStart.getTime() - a.scheduledStart.getTime());
 
 	return (
 		<OrgSection
@@ -35,11 +27,11 @@ function Events() {
 			description="Every event across your event groups."
 		>
 			<Show
-				when={events().length > 0}
+				when={data().events.length > 0}
 				fallback={
 					<EmptyState
 						title="No events yet"
-						description="Events are created inside an event group. Once you add some, they all show up here."
+						description="Events are the distances or classes inside an event group, like the 100 mile and the 50K. They'll all be listed here."
 					/>
 				}
 			>
@@ -54,27 +46,24 @@ function Events() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						<For each={events()}>
+						<For each={data().events}>
 							{(event) => (
 								<TableRow>
 									<TableCell class="font-semibold">{event.name}</TableCell>
 									<TableCell>
 										<Link
-											to="/orgs/$orgSlug/event-groups/$groupSlug"
-											params={{
-												orgSlug: params().orgSlug,
-												groupSlug: event.group.slug,
-											}}
+											to="/event-groups/$eventGroupId"
+											params={{ eventGroupId: event.eventGroupId }}
 											class="text-foreground underline-offset-4 hover:underline"
 										>
-											{event.group.name}
+											{event.eventGroupName}
 										</Link>
 									</TableCell>
 									<TableCell class="text-muted-foreground">
 										{event.courseName}
 									</TableCell>
 									<TableCell class="whitespace-nowrap tabular-nums">
-										{formatDateTime(event.scheduledStart, event.group.timeZone)}
+										{formatStart(event.scheduledStart)}
 									</TableCell>
 									<TableCell class="text-right tabular-nums">
 										{event.lapsRequired}

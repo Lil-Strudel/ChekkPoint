@@ -13,9 +13,11 @@ import {
 import type { Viewer } from "../auth/session.server";
 import { db } from "../db";
 import {
+	courses,
 	eventGroupStaff,
 	eventGroupStaffTimingPoints,
 	eventGroups,
+	events,
 	organizationInvitations,
 	organizationMembers,
 	organizations,
@@ -93,58 +95,87 @@ export async function getOrganizationOverview(viewer: Viewer, slug: string) {
 		updateMembers: orgRolesCan(myRoles, "member", "update"),
 		createEventGroup: orgRolesCan(myRoles, "eventGroup", "create"),
 		createTimingPoint: orgRolesCan(myRoles, "timingPoint", "create"),
+		updateOrganization: orgRolesCan(myRoles, "organization", "update"),
+		deleteOrganization: orgRolesCan(myRoles, "organization", "delete"),
 	};
 
-	const [members, invitations, groups, points] = await Promise.all([
-		db
-			.select({
-				id: organizationMembers.id,
-				userId: users.id,
-				name: users.name,
-				email: users.email,
-				role: organizationMembers.role,
-			})
-			.from(organizationMembers)
-			.innerJoin(users, eq(users.id, organizationMembers.userId))
-			.where(eq(organizationMembers.organizationId, org.id))
-			.orderBy(asc(users.name)),
-		can.invite
-			? db
-					.select({
-						id: organizationInvitations.id,
-						email: organizationInvitations.email,
-						role: organizationInvitations.role,
-						expiresAt: organizationInvitations.expiresAt,
-					})
-					.from(organizationInvitations)
-					.where(
-						and(
-							eq(organizationInvitations.organizationId, org.id),
-							eq(organizationInvitations.status, "pending"),
-						),
-					)
-			: Promise.resolve([]),
-		db
-			.select({
-				id: eventGroups.id,
-				name: eventGroups.name,
-				discipline: eventGroups.discipline,
-				startDate: eventGroups.startDate,
-				endDate: eventGroups.endDate,
-			})
-			.from(eventGroups)
-			.where(eq(eventGroups.organizationId, org.id))
-			.orderBy(desc(eventGroups.startDate)),
-		db
-			.select({
-				id: timingPoints.id,
-				name: timingPoints.name,
-				code: timingPoints.code,
-			})
-			.from(timingPoints)
-			.where(eq(timingPoints.organizationId, org.id))
-			.orderBy(asc(timingPoints.code)),
-	]);
+	const [members, invitations, groups, points, orgCourses, orgEvents] =
+		await Promise.all([
+			db
+				.select({
+					id: organizationMembers.id,
+					userId: users.id,
+					name: users.name,
+					email: users.email,
+					role: organizationMembers.role,
+				})
+				.from(organizationMembers)
+				.innerJoin(users, eq(users.id, organizationMembers.userId))
+				.where(eq(organizationMembers.organizationId, org.id))
+				.orderBy(asc(users.name)),
+			can.invite
+				? db
+						.select({
+							id: organizationInvitations.id,
+							email: organizationInvitations.email,
+							role: organizationInvitations.role,
+							expiresAt: organizationInvitations.expiresAt,
+						})
+						.from(organizationInvitations)
+						.where(
+							and(
+								eq(organizationInvitations.organizationId, org.id),
+								eq(organizationInvitations.status, "pending"),
+							),
+						)
+				: Promise.resolve([]),
+			db
+				.select({
+					id: eventGroups.id,
+					name: eventGroups.name,
+					discipline: eventGroups.discipline,
+					startDate: eventGroups.startDate,
+					endDate: eventGroups.endDate,
+				})
+				.from(eventGroups)
+				.where(eq(eventGroups.organizationId, org.id))
+				.orderBy(desc(eventGroups.startDate)),
+			db
+				.select({
+					id: timingPoints.id,
+					name: timingPoints.name,
+					code: timingPoints.code,
+					elevationMeters: timingPoints.elevationMeters,
+				})
+				.from(timingPoints)
+				.where(eq(timingPoints.organizationId, org.id))
+				.orderBy(asc(timingPoints.code)),
+			db
+				.select({
+					id: courses.id,
+					name: courses.name,
+					distanceMeters: courses.distanceMeters,
+					elevationGainMeters: courses.elevationGainMeters,
+				})
+				.from(courses)
+				.where(eq(courses.organizationId, org.id))
+				.orderBy(asc(courses.name)),
+			db
+				.select({
+					id: events.id,
+					name: events.name,
+					eventGroupId: eventGroups.id,
+					eventGroupName: eventGroups.name,
+					courseName: courses.name,
+					scheduledStart: events.scheduledStart,
+					lapsRequired: events.lapsRequired,
+				})
+				.from(events)
+				.innerJoin(eventGroups, eq(eventGroups.id, events.eventGroupId))
+				.innerJoin(courses, eq(courses.id, events.courseId))
+				.where(eq(eventGroups.organizationId, org.id))
+				.orderBy(desc(events.scheduledStart)),
+		]);
 
 	return {
 		organization: org,
@@ -154,6 +185,8 @@ export async function getOrganizationOverview(viewer: Viewer, slug: string) {
 		invitations,
 		eventGroups: groups,
 		timingPoints: points,
+		courses: orgCourses,
+		events: orgEvents,
 	};
 }
 

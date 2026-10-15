@@ -2,7 +2,6 @@ import { createFileRoute, getRouteApi } from "@tanstack/solid-router";
 import { For, Show } from "solid-js";
 import EmptyState from "~/components/EmptyState";
 import OrgSection from "~/components/OrgSection";
-import { Button } from "~/components/ui/button";
 import {
 	Table,
 	TableBody,
@@ -11,13 +10,13 @@ import {
 	TableHeader,
 	TableRow,
 } from "~/components/ui/table";
-import { formatFeet, formatMiles } from "~/lib/organizations";
+import { formatFeet, formatMiles } from "~/orgs/format";
 
-export const Route = createFileRoute("/orgs/$orgSlug/courses")({
+export const Route = createFileRoute("/_authed/orgs/$slug/courses")({
 	component: Courses,
 });
 
-const orgRoute = getRouteApi("/orgs/$orgSlug");
+const orgRoute = getRouteApi("/_authed/orgs/$slug");
 
 function Courses() {
 	const data = orgRoute.useLoaderData();
@@ -26,14 +25,13 @@ function Courses() {
 		<OrgSection
 			title="Courses"
 			description="Routes your events run on, shared across event groups."
-			action={<Button disabled>New course</Button>}
 		>
 			<Show
-				when={data().org.courses.length > 0}
+				when={data().courses.length > 0}
 				fallback={
 					<EmptyState
 						title="No courses yet"
-						description="Add a course once and reuse it every year, or copy it when the route changes."
+						description="A course is set up once and reused every year, or copied when the route changes."
 					/>
 				}
 			>
@@ -46,7 +44,7 @@ function Courses() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						<For each={data().org.courses}>
+						<For each={data().courses}>
 							{(course) => (
 								<TableRow>
 									<TableCell class="font-semibold">{course.name}</TableCell>
