@@ -43,6 +43,8 @@ Defined in `@theme` (Tailwind semantic tokens) and `:root` (CSS variables). The 
 | `--sand` / `sand` | `#e3d8c3` | Neutral fill (reserve for subtle blocks) |
 | `--destructive` | `#b4503f` | Errors, destructive actions |
 
+Use palette utilities (`text-forest`, `bg-clay/15`) only for brand accents the semantic tokens below don't cover. Never Tailwind's default palette (`amber-*`, `purple-*`, `white`…) or colour literals in components.
+
 ### solid-ui Theme Mapping
 
 | Token | Mapping | Spec |
@@ -63,6 +65,21 @@ Defined in `@theme` (Tailwind semantic tokens) and `:root` (CSS variables). The 
 | `--accent-foreground` | `var(--forest-deep)` | Accent text |
 | `--border` / `--input` | `rgba(43, 58, 47, 0.14)` | Hairline borders & inputs |
 | `--ring` | `var(--forest)` | Focus ring |
+| `--destructive-foreground` | `#ffffff` | Text on solid destructive fill |
+| `--surface` | `rgba(255, 255, 255, 0.6)` | Input and chip fill |
+| `--info` / `--info-foreground` | forest 10% / `var(--forest)` | Informational status |
+| `--success` / `--success-foreground` | sage 20% / `var(--forest-deep)` | Success status |
+| `--warning` / `--warning-foreground` | clay 12% / `var(--clay)` | Warning status |
+| `--error` / `--error-foreground` | destructive 10% / `var(--destructive)` | Error status |
+| `--sidebar-*` | paper / ink / forest / accent | Same mapping as the main surface tokens |
+
+### Shape & depth tokens
+
+| Token | Utility | Value |
+|---|---|---|
+| `--radius` | `rounded-lg` | `1.25rem` (20px); `rounded-xs` / `-md` / `-xl` are −4px / −2px / +4px |
+| `--shadow-glass` | `shadow-glass` | `0 12px 32px -18px rgba(52,70,52,.22)` |
+| `--blur-glass` | `backdrop-blur-glass` | `14px` |
 
 Body background: paper + two subtle radial washes (sage `rgba(143,168,140,.18)` top-left, clay `rgba(193,120,91,.10)` bottom-right) + single-layer fixed topo.
 
@@ -112,11 +129,11 @@ Preloading: WOFF2 assets for EB Garamond and Manrope are preloaded via `<link re
 
 | Property | Value |
 |---|---|
-| Background | `rgba(250,248,243,.78)` (`--card`) |
-| Backdrop | `blur(14px) saturate(1.1)` |
-| Border | `1px solid rgba(43,58,47,.14)` (`--border`) |
-| Radius | **20px** (`rounded-[20px]`) |
-| Shadow | `0 12px 32px -18px rgba(52,70,52,.22)` |
+| Background | `bg-card` (`rgba(250,248,243,.78)`) |
+| Backdrop | `backdrop-blur-glass backdrop-saturate-110` (`blur(14px) saturate(1.1)`) |
+| Border | `border border-border` (`1px solid rgba(43,58,47,.14)`) |
+| Radius | `rounded-lg` (**20px**) |
+| Shadow | `shadow-glass` (`0 12px 32px -18px rgba(52,70,52,.22)`) |
 
 ---
 
@@ -170,13 +187,13 @@ All application UI is built from genuine `solid-ui` components located in `src/c
 
 | Component | Source File | Kobalte Primitive | Variants / Notes |
 |---|---|---|---|
-| `<Button>` | `ui/button.tsx` | `@kobalte/core/button` | `default`, `destructive`, `outline`, `secondary`, `ghost`, `link`, `pill`, `telemetry`. Sizes: `default`, `sm`, `lg`, `icon`, `pill`. Supports polymorphic `as={Link}`. |
+| `<Button>` | `ui/button.tsx` | `@kobalte/core/button` | `default`, `destructive`, `outline`, `secondary`, `ghost`, `link`, `pill`. Sizes: `default`, `sm`, `lg`, `icon`, `pill`. Supports polymorphic `as={Link}`. |
 | `<Card>` | `ui/card.tsx` | Native polymorphic | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`, `CardAction`. Glass default styling built in. |
-| `<Badge>` | `ui/badge.tsx` | `@kobalte/core/badge` | `default`, `secondary`, `destructive`, `outline`, `forest`, `sage`, `clay`, `sand`, `amber`, `purple`, `chip`. |
+| `<Badge>` | `ui/badge.tsx` | `@kobalte/core/badge` | `default`, `secondary`, `destructive`, `outline`, `forest`, `sage`, `clay`, `sand`, `chip`. |
 | `<Separator>` | `ui/separator.tsx` | `@kobalte/core/separator` | Horizontal or vertical hairline dividers. |
 | `<TextField>` | `ui/text-field.tsx` | `@kobalte/core/text-field` | Suite with `TextField`, `TextFieldInput`, `TextFieldTextArea`, `TextFieldLabel`, `TextFieldErrorMessage`, `TextFieldDescription`. |
-| `<Input>` | `ui/input.tsx` | Native polymorphic | Styled with theme tokens `border-input`, `bg-surface`, `focus-visible:ring-ring`. |
-| `<Textarea>` | `ui/textarea.tsx` | Native polymorphic | Styled multiline text area matching input styling. |
+| `<Input>` | `ui/input.tsx` | Native `<input>` | Styled with theme tokens `border-input`, `bg-surface`, `focus-visible:ring-ring`. |
+| `<Textarea>` | `ui/textarea.tsx` | Native `<textarea>` | Styled multiline text area matching input styling. |
 | `<Select>` | `ui/select.tsx` | `@kobalte/core/select` | `Select`, `SelectTrigger`, `SelectValue`, `SelectContent`, `SelectItem`, `SelectLabel`, `SelectDescription`. |
 | `<Table>` | `ui/table.tsx` | Native container | `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`. Built-in responsive scroll container and hover states. |
 | `<Alert>` | `ui/alert.tsx` | `@kobalte/core/alert` | `Alert`, `AlertTitle`, `AlertDescription`. Variants: `default`, `destructive`, `warning` (clay), `info` (forest). |
@@ -205,7 +222,7 @@ All transitions, animations, and smooth scroll behaviors automatically collapse 
 
 ### Contrast & Focus Visibility
 - AAA contrast on primary ink on paper (10:1).
-- Accessible focus rings: `focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-[3px]`.
+- Accessible focus rings: `focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-3`.
 - All interactive elements use Kobalte keyboard navigation and WAI-ARIA roles.
 
 ---

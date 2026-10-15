@@ -57,10 +57,8 @@ Mirror `button.tsx` and the closest solid-ui source:
 
 ## 5. Style it
 
-The look comes from `docs/style-guide.md`. Use only the semantic token utilities in `src/styles.css` (`bg-primary`, `text-muted-foreground`, `rounded-md`…), never color literals or arbitrary values that bypass them. Brand values belong in the tokens, not in components: if the guide needs something no token expresses, add a token. Restyle a copied component's classes; keep its structure, props and variant names.
-
-If the style guide doesn't exist yet, leave copied components as they are, use the tokens for new markup, invent no brand values, and say the styling is waiting on the guide.
+Follow `docs/style-guide.md`. Use its tokens from `src/styles.css`: semantic utilities first, palette (`forest`, `clay`…) only for brand accents. No Tailwind default colours, colour literals, `dark:`, or arbitrary values (`rounded-[20px]` → `rounded-lg`); if a token is missing, add it to both files. Restyle a copied component's classes; keep its structure, props and variant names.
 
 ## 6. Use and verify
 
-Replace the ad-hoc markup at the call site; mention other pages that could use it rather than migrating them. Then `pnpm biome check` and `pnpm typecheck` must pass, and look at it rendered in every variant and state. Report anything you couldn't check.
+Replace the ad-hoc markup at the call site; mention other pages that could use it rather than migrating them. List it in the style guide's components table. Then `pnpm biome check` and `pnpm typecheck` must pass, and look at it rendered in every variant and state. Report anything you couldn't check.

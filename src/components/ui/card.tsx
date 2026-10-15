@@ -11,7 +11,7 @@ export const Card = (props: CardProps) => {
 		<div
 			data-slot="card"
 			class={cn(
-				"bg-card text-card-foreground rounded-[20px] border border-border shadow-[0_12px_32px_-18px_rgba(52,70,52,0.22)] backdrop-blur-[14px] saturate-[1.1] transition-all relative overflow-hidden",
+				"bg-card text-card-foreground rounded-lg border border-border shadow-glass backdrop-blur-glass backdrop-saturate-110 transition-all relative overflow-hidden",
 				local.class,
 			)}
 			{...others}
@@ -42,7 +42,7 @@ export const CardTitle = (props: CardTitleProps) => {
 		<h3
 			data-slot="card-title"
 			class={cn(
-				"font-display text-xl font-normal leading-none tracking-tight text-foreground",
+				"font-display text-xl font-normal leading-none text-foreground",
 				local.class,
 			)}
 			{...others}

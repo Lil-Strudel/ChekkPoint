@@ -11,7 +11,7 @@ export const Textarea = (props: TextareaProps) => {
 		<textarea
 			data-slot="textarea"
 			class={cn(
-				"border-input bg-surface text-foreground placeholder:text-muted-foreground flex min-h-[7rem] w-full rounded-xl border px-3 py-2 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+				"border-input bg-surface text-foreground placeholder:text-muted-foreground flex min-h-28 w-full rounded-xl border px-3 py-2 text-sm shadow-xs transition-colors outline-hidden focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50",
 				local.class,
 			)}
 			{...others}

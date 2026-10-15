@@ -459,8 +459,8 @@ function DomainOverviewView(props: {
 						</div>
 					</Card>
 
-					<Card class="p-5 border-l-4 border-l-amber-600">
-						<span class="text-xs font-bold uppercase tracking-wider text-amber-700">
+					<Card class="p-5 border-l-4 border-l-clay">
+						<span class="text-xs font-bold uppercase tracking-wider text-clay">
 							3. Read Plane & Operations
 						</span>
 						<h4 class="text-base font-bold text-foreground mt-1">
@@ -472,7 +472,7 @@ function DomainOverviewView(props: {
 							manual steward change.
 						</p>
 						<div class="mt-3 flex flex-wrap gap-1">
-							<Badge variant="amber" class="text-[10px] py-0 px-1.5 font-bold">
+							<Badge variant="clay" class="text-[10px] py-0 px-1.5 font-bold">
 								scoredSplitTimes
 							</Badge>
 							<Badge variant="chip" class="text-[10px] py-0 px-1.5">
@@ -484,8 +484,8 @@ function DomainOverviewView(props: {
 						</div>
 					</Card>
 
-					<Card class="p-5 border-l-4 border-l-purple-600">
-						<span class="text-xs font-bold uppercase tracking-wider text-purple-700">
+					<Card class="p-5 border-l-4 border-l-sage">
+						<span class="text-xs font-bold uppercase tracking-wider text-forest-deep">
 							4. Competitor History & Projections
 						</span>
 						<h4 class="text-base font-bold text-foreground mt-1">
@@ -497,10 +497,10 @@ function DomainOverviewView(props: {
 							flag SAR/cutoff risks.
 						</p>
 						<div class="mt-3 flex flex-wrap gap-1">
-							<Badge variant="purple" class="text-[10px] py-0 px-1.5 font-bold">
+							<Badge variant="sage" class="text-[10px] py-0 px-1.5 font-bold">
 								personExternalProfiles
 							</Badge>
-							<Badge variant="purple" class="text-[10px] py-0 px-1.5 font-bold">
+							<Badge variant="sage" class="text-[10px] py-0 px-1.5 font-bold">
 								personRaceHistory
 							</Badge>
 							<Badge variant="chip" class="text-[10px] py-0 px-1.5">
@@ -872,7 +872,7 @@ function CollectionSchemaView(props: { collection: CollectionMetadata }) {
 										</TableCell>
 										<TableCell>
 											<Badge
-												variant={idx.unique ? "amber" : "chip"}
+												variant={idx.unique ? "clay" : "chip"}
 												class="text-[10px] py-0 px-1.5"
 											>
 												{idx.unique ? "UNIQUE" : "INDEX"}

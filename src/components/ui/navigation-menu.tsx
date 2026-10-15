@@ -30,7 +30,7 @@ export const NavigationMenu = <T extends ValidComponent = "ul">(
 			{...others}
 		>
 			{local.children}
-			<NavigationMenuPrimitive.Viewport class="origin-top-center relative mt-1.5 h-[var(--kb-navigation-menu-viewport-height)] w-full overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg backdrop-blur-md transition-[width,height] duration-300" />
+			<NavigationMenuPrimitive.Viewport class="origin-top relative mt-1.5 h-[var(--kb-navigation-menu-viewport-height)] w-full overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg backdrop-blur-md transition-[width,height] duration-300" />
 		</NavigationMenuPrimitive.Root>
 	);
 };
@@ -98,7 +98,7 @@ export const NavigationMenuTrigger = <T extends ValidComponent = "button">(
 		<NavigationMenuPrimitive.Trigger
 			data-slot="navigation-menu-trigger"
 			class={cn(
-				"group inline-flex h-9 w-max items-center justify-center rounded-xl bg-transparent px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50",
+				"group inline-flex h-9 w-max items-center justify-center rounded-xl bg-transparent px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50",
 				local.class,
 			)}
 			{...others}

@@ -22,7 +22,7 @@ export const Separator = <T extends ValidComponent = "hr">(
 			data-slot="separator"
 			orientation={local.orientation ?? "horizontal"}
 			class={cn(
-				"bg-border shrink-0 border-none data-[orientation=horizontal]:h-[1px] data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-[1px]",
+				"bg-border shrink-0 border-none data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px",
 				local.class,
 			)}
 			{...others}

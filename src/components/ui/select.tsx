@@ -29,7 +29,7 @@ export const SelectTrigger = <T extends ValidComponent = "button">(
 		<SelectPrimitive.Trigger
 			data-slot="select-trigger"
 			class={cn(
-				"border-input bg-surface text-foreground flex h-9 w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+				"border-input bg-surface text-foreground flex h-9 w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-sm shadow-xs transition-colors outline-hidden focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50",
 				local.class,
 			)}
 			{...others}
@@ -69,12 +69,12 @@ export const SelectContent = <T extends ValidComponent = "div">(
 			<SelectPrimitive.Content
 				data-slot="select-content"
 				class={cn(
-					"bg-popover text-popover-foreground relative z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border shadow-lg backdrop-blur-md animate-in fade-in-80",
+					"bg-popover text-popover-foreground relative z-50 min-w-32 overflow-hidden rounded-xl border border-border shadow-lg backdrop-blur-md animate-in fade-in-80",
 					local.class,
 				)}
 				{...others}
 			>
-				<SelectPrimitive.Listbox class="p-1 outline-none" />
+				<SelectPrimitive.Listbox class="p-1 outline-hidden" />
 			</SelectPrimitive.Content>
 		</SelectPrimitive.Portal>
 	);
@@ -98,7 +98,7 @@ export const SelectItem = <T extends ValidComponent = "li">(
 		<SelectPrimitive.Item
 			data-slot="select-item"
 			class={cn(
-				"focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-default items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+				"focus:bg-accent focus:text-accent-foreground relative flex w-full cursor-default items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 				local.class,
 			)}
 			{...others}

@@ -19,7 +19,10 @@ export const Table = (props: TableProps) => {
 		>
 			<table
 				data-slot="table"
-				class={cn("w-full caption-bottom text-sm border-collapse", local.class)}
+				class={cn(
+					"w-full caption-bottom text-sm tabular-nums border-collapse",
+					local.class,
+				)}
 				{...others}
 			/>
 		</div>
@@ -80,7 +83,7 @@ export const TableRow = (props: TableRowProps) => {
 		<tr
 			data-slot="table-row"
 			class={cn(
-				"border-b border-border/70 transition-colors hover:bg-sage/10 data-[state=selected]:bg-muted",
+				"border-b border-border/70 transition-colors hover:bg-accent/50 data-[state=selected]:bg-muted",
 				local.class,
 			)}
 			{...others}
@@ -97,7 +100,7 @@ export const TableHead = (props: TableHeadProps) => {
 		<th
 			data-slot="table-head"
 			class={cn(
-				"h-10 px-4 py-3 text-left align-middle text-xs font-bold uppercase tracking-wider text-forest whitespace-nowrap bg-muted/30",
+				"h-10 px-4 py-3 text-left align-middle text-xs font-bold uppercase tracking-widest text-forest whitespace-nowrap bg-muted/30",
 				local.class,
 			)}
 			{...others}

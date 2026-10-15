@@ -6,7 +6,7 @@ import { splitProps } from "solid-js";
 import { cn } from "~/lib/utils";
 
 export const badgeVariants = cva(
-	"inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 text-xs font-semibold w-fit whitespace-nowrap shrink-0 transition-colors gap-1 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+	"inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 text-xs font-semibold w-fit whitespace-nowrap shrink-0 transition-colors gap-1 outline-hidden focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-3",
 	{
 		variants: {
 			variant: {
@@ -15,15 +15,12 @@ export const badgeVariants = cva(
 				secondary:
 					"border-border bg-secondary text-secondary-foreground shadow-xs",
 				destructive: "border-destructive/30 bg-destructive/15 text-destructive",
-				outline: "border-border text-foreground bg-white/40 backdrop-blur-xs",
-				forest: "border-forest/30 bg-forest/15 text-forest font-semibold",
-				sage: "border-sage/40 bg-sage/20 text-forest-deep font-semibold",
-				clay: "border-clay/30 bg-clay/15 text-clay font-semibold",
+				outline:
+					"border-border bg-secondary/60 text-foreground backdrop-blur-xs",
+				forest: "border-forest/30 bg-forest/15 text-forest",
+				sage: "border-sage/40 bg-sage/20 text-forest-deep",
+				clay: "border-clay/30 bg-clay/15 text-clay",
 				sand: "border-sand bg-sand/40 text-muted-foreground",
-				amber:
-					"border-amber-500/30 bg-amber-500/15 text-amber-800 font-semibold",
-				purple:
-					"border-purple-500/30 bg-purple-500/15 text-purple-800 font-semibold",
 				chip: "border-border/80 bg-surface text-muted-foreground font-medium",
 			},
 		},

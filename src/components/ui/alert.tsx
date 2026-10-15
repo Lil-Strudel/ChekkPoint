@@ -1,7 +1,7 @@
 import * as AlertPrimitive from "@kobalte/core/alert";
 import type { PolymorphicProps } from "@kobalte/core/polymorphic";
 import { cva, type VariantProps } from "class-variance-authority";
-import type { JSX, ValidComponent } from "solid-js";
+import type { ComponentProps, JSX, ValidComponent } from "solid-js";
 import { splitProps } from "solid-js";
 import { cn } from "~/lib/utils";
 
@@ -11,8 +11,7 @@ export const alertVariants = cva(
 		variants: {
 			variant: {
 				default: "border-border bg-card/85 text-card-foreground shadow-xs",
-				destructive:
-					"border-destructive/30 bg-destructive/10 text-destructive-foreground dark:border-destructive/40",
+				destructive: "border-destructive/30 bg-destructive/10 text-destructive",
 				warning: "border-clay/35 bg-clay/10 text-foreground",
 				info: "border-forest/35 bg-forest/10 text-foreground",
 			},
@@ -45,8 +44,6 @@ export const Alert = <T extends ValidComponent = "div">(
 };
 
 export type AlertTitleProps = ComponentProps<"h5">;
-
-import type { ComponentProps } from "solid-js";
 
 export const AlertTitle = (props: AlertTitleProps) => {
 	const [local, others] = splitProps(props, ["class"]);
