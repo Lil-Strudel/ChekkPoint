@@ -307,6 +307,20 @@ export const COLLECTIONS: readonly CollectionMetadata[] = [
 					"Sporting discipline defining scoring rules and calculation pipelines.",
 			},
 			{
+				name: "timeZone",
+				type: "text",
+				nullable: false,
+				defaultValue: "'UTC'",
+				description:
+					"IANA time zone the race runs in; scheduled starts are entered and shown in it.",
+			},
+			{
+				name: "location",
+				type: "text",
+				nullable: true,
+				description: "Venue or town shown alongside the event group.",
+			},
+			{
 				name: "rulesConfig",
 				type: "jsonb (RulesConfig)",
 				nullable: false,

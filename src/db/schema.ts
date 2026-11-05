@@ -334,6 +334,8 @@ export const eventGroups = pgTable(
 		name: text("name").notNull(), // e.g. "Wasatch 100 Weekend 2026"
 		slug: text("slug").notNull(),
 		discipline: disciplineEnum("discipline").notNull(),
+		timeZone: text("time_zone").default("UTC").notNull(), // IANA name, e.g. "America/Denver"
+		location: text("location"),
 		rulesConfig: jsonb("rules_config").$type<RulesConfig>().notNull(),
 		startDate: timestamp("start_date", {
 			withTimezone: true,

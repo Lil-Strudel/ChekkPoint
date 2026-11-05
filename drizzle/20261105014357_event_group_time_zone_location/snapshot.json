@@ -1,0 +1,81 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "e9b312ad-3f6a-472a-813a-f29b00543602",
+  "prevIds": [
+    "64aa605c-ca76-4c59-9b51-147d65866737"
+  ],
+  "footprints": [
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "event_groups",
+        "time_zone"
+      ],
+      "writes": [
+        "s|col|public.event_groups.time_zone",
+        "n|col|public.event_groups.time_zone",
+        "e|col|public.event_groups.time_zone"
+      ],
+      "reads": [
+        "n|tbl|public.event_groups",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "event_groups",
+        "location"
+      ],
+      "writes": [
+        "s|col|public.event_groups.location",
+        "n|col|public.event_groups.location",
+        "e|col|public.event_groups.location"
+      ],
+      "reads": [
+        "n|tbl|public.event_groups",
+        "n|sch|public"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event_groups",
+        "name": "time_zone",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'UTC'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "event_groups",
+        "name": "location",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    }
+  ]
+}
