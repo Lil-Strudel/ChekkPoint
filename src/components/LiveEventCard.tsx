@@ -1,50 +1,76 @@
+import { Link } from "@tanstack/solid-router";
+import { Badge } from "~/components/ui/badge";
 import { Card } from "~/components/ui/card";
 import {
 	Progress,
 	ProgressLabel,
 	ProgressValueLabel,
 } from "~/components/ui/progress";
-import {
-	disciplineLabels,
-	elapsedHours,
-	formatRaceClock,
-	type LiveEventGroup,
-} from "~/lib/events";
+import { formatRaceClock } from "~/lib/events";
+import type { getPublicHomeData } from "~/public/public.functions";
+import { DISCIPLINE_META } from "~/public/public.shared";
+
+export type EnrichedPublicEventGroup = Awaited<
+	ReturnType<typeof getPublicHomeData>
+>["liveGroups"][number];
 
 export default function LiveEventCard(props: {
-	group: LiveEventGroup;
+	group: EnrichedPublicEventGroup;
 	now: Date;
 }) {
-	const elapsed = () => elapsedHours(props.group, props.now);
+	const elapsedHours = () => {
+		const startMs = new Date(props.group.startDate).getTime();
+		return Math.max(0, (props.now.getTime() - startMs) / 3_600_000);
+	};
+
+	const discMeta = () => DISCIPLINE_META[props.group.discipline];
 
 	return (
-		<Card class="flex flex-col gap-6 border-clay/40 p-7">
-			<span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-clay">
-				<span class="relative flex size-2">
-					<span class="absolute inline-flex size-full animate-ping rounded-full bg-clay opacity-60" />
-					<span class="relative inline-flex size-2 rounded-full bg-clay" />
+		<Card class="flex flex-col gap-5 border-clay/40 p-6">
+			<div class="flex flex-wrap items-center justify-between gap-2">
+				<span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-clay">
+					<span class="relative inline-flex size-2.5 rounded-full bg-clay ring-4 ring-clay/20" />
+					Live now
 				</span>
-				Live now
-			</span>
+				<Badge variant={discMeta().badgeVariant}>{discMeta().label}</Badge>
+			</div>
 
 			<div>
 				<h2 class="font-display m-0 text-3xl font-normal leading-tight text-foreground">
-					{props.group.name}
+					<Link
+						to="/events/$slug"
+						params={{ slug: props.group.slug }}
+						class="text-foreground no-underline hover:text-forest"
+					>
+						{props.group.name}
+					</Link>
 				</h2>
 				<p class="m-0 mt-1 text-sm text-muted-foreground">
-					{disciplineLabels[props.group.discipline]} · {props.group.location}
+					{props.group.location} ·{" "}
+					<Link
+						to="/organizers/$slug"
+						params={{ slug: props.group.organizationSlug }}
+						class="text-muted-foreground hover:text-forest"
+					>
+						{props.group.organizationName}
+					</Link>
 				</p>
 			</div>
 
-			<p class="m-0 flex items-baseline gap-2">
-				<span class="font-display text-5xl leading-none tabular-nums text-foreground">
-					{props.group.onCourse}
+			<div class="flex items-baseline justify-between gap-4">
+				<div class="flex items-baseline gap-2">
+					<span class="font-display text-4xl leading-none tabular-nums text-foreground">
+						{props.group.counts.onCourse}
+					</span>
+					<span class="text-sm text-muted-foreground">on course</span>
+				</div>
+				<span class="text-xs tabular-nums text-muted-foreground">
+					{props.group.counts.finished} finished
 				</span>
-				<span class="text-sm text-muted-foreground">on course</span>
-			</p>
+			</div>
 
 			<Progress
-				value={Math.min(elapsed(), props.group.timeLimitHours)}
+				value={Math.min(elapsedHours(), props.group.timeLimitHours)}
 				maxValue={props.group.timeLimitHours}
 				getValueLabel={({ value, max }) =>
 					`${formatRaceClock(value * 3_600_000)} of ${formatRaceClock(max * 3_600_000)}`
@@ -58,6 +84,16 @@ export default function LiveEventCard(props: {
 					<ProgressValueLabel class="text-xs font-semibold tabular-nums" />
 				</div>
 			</Progress>
+
+			<div>
+				<Link
+					to="/events/$slug"
+					params={{ slug: props.group.slug }}
+					class="text-sm font-semibold text-forest no-underline hover:underline"
+				>
+					View live race &rarr;
+				</Link>
+			</div>
 		</Card>
 	);
 }
