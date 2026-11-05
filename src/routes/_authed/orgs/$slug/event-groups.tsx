@@ -1,11 +1,9 @@
 import { createFileRoute, getRouteApi, Link } from "@tanstack/solid-router";
 import { createSignal, For, Show } from "solid-js";
 import EmptyState from "~/components/EmptyState";
-import FormSelect from "~/components/FormSelect";
+import EventGroupForm from "~/components/EventGroupForm";
 import OrgSection from "~/components/OrgSection";
-import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
 import {
 	Table,
 	TableBody,
@@ -14,27 +12,16 @@ import {
 	TableHeader,
 	TableRow,
 } from "~/components/ui/table";
-import {
-	TextField,
-	TextFieldInput,
-	TextFieldLabel,
-} from "~/components/ui/text-field";
-import { type Discipline, disciplineLabels } from "~/lib/events";
+import { disciplineLabels } from "~/lib/events";
 import { createOrgAction } from "~/orgs/actions";
 import { formatDay } from "~/orgs/format";
 import { addEventGroup } from "~/orgs/orgs.functions";
-import { DISCIPLINES } from "~/orgs/orgs.shared";
 
 export const Route = createFileRoute("/_authed/orgs/$slug/event-groups")({
 	component: EventGroups,
 });
 
 const orgRoute = getRouteApi("/_authed/orgs/$slug");
-
-const disciplineOptions = DISCIPLINES.map((value) => ({
-	value,
-	label: disciplineLabels[value],
-}));
 
 function EventGroups() {
 	const data = orgRoute.useLoaderData();
@@ -77,6 +64,7 @@ function EventGroups() {
 							<TableRow>
 								<TableHead>Name</TableHead>
 								<TableHead>Discipline</TableHead>
+								<TableHead>Location</TableHead>
 								<TableHead>Starts</TableHead>
 								<TableHead>Ends</TableHead>
 								<TableHead class="text-right">Events</TableHead>
@@ -97,6 +85,9 @@ function EventGroups() {
 										</TableCell>
 										<TableCell class="text-muted-foreground">
 											{disciplineLabels[group.discipline]}
+										</TableCell>
+										<TableCell class="text-muted-foreground">
+											{group.location ?? "—"}
 										</TableCell>
 										<TableCell class="whitespace-nowrap tabular-nums">
 											{formatDay(group.startDate)}
@@ -120,64 +111,24 @@ function EventGroups() {
 
 function NewEventGroup(props: { organizationId: string; onDone: () => void }) {
 	const action = createOrgAction();
-	const [name, setName] = createSignal("");
-	const [discipline, setDiscipline] = createSignal<Discipline>("trail_ultra");
-	const [startDate, setStartDate] = createSignal("");
-	const [endDate, setEndDate] = createSignal("");
-
-	const submit = async (e: SubmitEvent) => {
-		e.preventDefault();
-		const ok = await action.run(() =>
-			addEventGroup({
-				data: {
-					organizationId: props.organizationId,
-					name: name(),
-					discipline: discipline(),
-					startDate: startDate(),
-					endDate: endDate() || startDate(),
-				},
-			}),
-		);
-		if (ok) props.onDone();
-	};
 
 	return (
-		<Card class="max-w-xl p-6">
-			<form class="grid gap-6" onSubmit={submit}>
-				<TextField value={name()} onChange={setName} required>
-					<TextFieldLabel>Name</TextFieldLabel>
-					<TextFieldInput placeholder="Bonneville Ridge Weekend 2027" />
-				</TextField>
-				<FormSelect
-					label="Discipline"
-					value={discipline()}
-					onChange={(value) => setDiscipline(value as Discipline)}
-					options={disciplineOptions}
-				/>
-				<div class="grid grid-cols-2 gap-4">
-					<TextField value={startDate()} onChange={setStartDate} required>
-						<TextFieldLabel>Starts</TextFieldLabel>
-						<TextFieldInput type="date" />
-					</TextField>
-					<TextField value={endDate()} onChange={setEndDate}>
-						<TextFieldLabel>Ends</TextFieldLabel>
-						<TextFieldInput type="date" />
-					</TextField>
-				</div>
-				<Show when={action.error()}>
-					<Alert variant="destructive">
-						<AlertDescription>{action.error()}</AlertDescription>
-					</Alert>
-				</Show>
-				<div class="flex flex-wrap gap-3">
-					<Button type="submit" disabled={action.pending()}>
-						Create event group
-					</Button>
-					<Button variant="ghost" onClick={props.onDone}>
-						Cancel
-					</Button>
-				</div>
-			</form>
-		</Card>
+		<EventGroupForm
+			submitLabel="Create event group"
+			error={action.error()}
+			pending={action.pending()}
+			onSubmit={async (group) => {
+				const ok = await action.run(() =>
+					addEventGroup({
+						data: { organizationId: props.organizationId, ...group },
+					}),
+				);
+				if (ok) props.onDone();
+			}}
+		>
+			<Button variant="ghost" onClick={props.onDone}>
+				Cancel
+			</Button>
+		</EventGroupForm>
 	);
 }

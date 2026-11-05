@@ -199,7 +199,7 @@ function CoursePage() {
 							{(event) => (
 								<li class="text-sm">
 									<Link
-										to="/event-groups/$eventGroupId"
+										to="/event-groups/$eventGroupId/events"
 										params={{ eventGroupId: event.eventGroupId }}
 										class="font-semibold text-foreground underline-offset-4 hover:underline"
 									>

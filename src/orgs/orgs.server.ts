@@ -220,6 +220,8 @@ export async function createEventGroup(
 			name: data.name,
 			slug: slugify(data.name),
 			discipline: data.discipline,
+			timeZone: data.timeZone,
+			location: data.location,
 			rulesConfig: RulesConfigSchema.parse({}),
 			startDate: new Date(data.startDate),
 			endDate: new Date(data.endDate),
@@ -299,6 +301,9 @@ export async function getEventGroupPage(viewer: Viewer, eventGroupId: string) {
 			discipline: eventGroups.discipline,
 			startDate: eventGroups.startDate,
 			endDate: eventGroups.endDate,
+			timeZone: eventGroups.timeZone,
+			location: eventGroups.location,
+			rulesConfig: eventGroups.rulesConfig,
 			organizationName: organizations.name,
 			organizationSlug: organizations.slug,
 		})
@@ -317,9 +322,32 @@ export async function getEventGroupPage(viewer: Viewer, eventGroupId: string) {
 		.orderBy(asc(timingPoints.code));
 
 	const manageStaff = canManageStaff(access);
-	const seesRoster = manageStaff || access.orgRoles.length > 0;
+	const isMember = access.orgRoles.length > 0;
 
-	const roster = seesRoster ? await loadRoster(eventGroupId) : [];
+	const [roster, groupEvents, orgCourses] = await Promise.all([
+		isMember ? loadRoster(eventGroupId) : [],
+		db
+			.select({
+				id: events.id,
+				name: events.name,
+				courseId: events.courseId,
+				courseName: courses.name,
+				lapsRequired: events.lapsRequired,
+				scheduledStart: events.scheduledStart,
+				actualStart: events.actualStart,
+			})
+			.from(events)
+			.innerJoin(courses, eq(courses.id, events.courseId))
+			.where(eq(events.eventGroupId, eventGroupId))
+			.orderBy(asc(events.scheduledStart)),
+		isMember
+			? db
+					.select({ id: courses.id, name: courses.name })
+					.from(courses)
+					.where(eq(courses.organizationId, access.organizationId))
+					.orderBy(asc(courses.name))
+			: [],
+	]);
 
 	const recorder = sql<string>`${people.firstName} || ' ' || ${people.lastName}`;
 	const recent = await db
@@ -346,11 +374,16 @@ export async function getEventGroupPage(viewer: Viewer, eventGroupId: string) {
 		},
 		can: {
 			manageStaff,
+			updateEventGroup: orgRolesCan(access.orgRoles, "eventGroup", "update"),
+			deleteEventGroup: orgRolesCan(access.orgRoles, "eventGroup", "delete"),
+			manageEntrants: orgRolesCan(access.orgRoles, "entrant", "update"),
 			recordAt: points
 				.filter((p) => canRecordAt(access, p.id))
 				.map((p) => p.id),
 		},
 		timingPoints: points,
+		events: groupEvents,
+		courses: orgCourses,
 		roster,
 		recentTimes: recent,
 	};
