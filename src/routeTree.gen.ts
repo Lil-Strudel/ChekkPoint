@@ -28,12 +28,13 @@ import { Route as AuthedOrgsNewRouteImport } from './routes/_authed/orgs/new'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiShapesHelloWorldRouteImport } from './routes/api/shapes/hello-world'
 import { Route as AuthedOrgsSlugIndexRouteImport } from './routes/_authed/orgs/$slug/index'
-import { Route as AuthedOrgsSlugCoursesRouteImport } from './routes/_authed/orgs/$slug/courses'
 import { Route as AuthedOrgsSlugEventGroupsRouteImport } from './routes/_authed/orgs/$slug/event-groups'
 import { Route as AuthedOrgsSlugEventsRouteImport } from './routes/_authed/orgs/$slug/events'
 import { Route as AuthedOrgsSlugMembersRouteImport } from './routes/_authed/orgs/$slug/members'
 import { Route as AuthedOrgsSlugSettingsRouteImport } from './routes/_authed/orgs/$slug/settings'
 import { Route as AuthedOrgsSlugTimingPointsRouteImport } from './routes/_authed/orgs/$slug/timing-points'
+import { Route as AuthedOrgsSlugCoursesIndexRouteImport } from './routes/_authed/orgs/$slug/courses/index'
+import { Route as AuthedOrgsSlugCoursesCourseIdRouteImport } from './routes/_authed/orgs/$slug/courses/$courseId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -131,11 +132,6 @@ const AuthedOrgsSlugIndexRoute = AuthedOrgsSlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedOrgsSlugRouteRoute,
 } as any)
-const AuthedOrgsSlugCoursesRoute = AuthedOrgsSlugCoursesRouteImport.update({
-  id: '/courses',
-  path: '/courses',
-  getParentRoute: () => AuthedOrgsSlugRouteRoute,
-} as any)
 const AuthedOrgsSlugEventGroupsRoute =
   AuthedOrgsSlugEventGroupsRouteImport.update({
     id: '/event-groups',
@@ -163,6 +159,18 @@ const AuthedOrgsSlugTimingPointsRoute =
     path: '/timing-points',
     getParentRoute: () => AuthedOrgsSlugRouteRoute,
   } as any)
+const AuthedOrgsSlugCoursesIndexRoute =
+  AuthedOrgsSlugCoursesIndexRouteImport.update({
+    id: '/courses/',
+    path: '/courses/',
+    getParentRoute: () => AuthedOrgsSlugRouteRoute,
+  } as any)
+const AuthedOrgsSlugCoursesCourseIdRoute =
+  AuthedOrgsSlugCoursesCourseIdRouteImport.update({
+    id: '/courses/$courseId',
+    path: '/courses/$courseId',
+    getParentRoute: () => AuthedOrgsSlugRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -182,13 +190,14 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
   '/orgs/': typeof AuthedOrgsIndexRoute
-  '/orgs/$slug/courses': typeof AuthedOrgsSlugCoursesRoute
   '/orgs/$slug/event-groups': typeof AuthedOrgsSlugEventGroupsRoute
   '/orgs/$slug/events': typeof AuthedOrgsSlugEventsRoute
   '/orgs/$slug/members': typeof AuthedOrgsSlugMembersRoute
   '/orgs/$slug/settings': typeof AuthedOrgsSlugSettingsRoute
   '/orgs/$slug/timing-points': typeof AuthedOrgsSlugTimingPointsRoute
   '/orgs/$slug/': typeof AuthedOrgsSlugIndexRoute
+  '/orgs/$slug/courses/$courseId': typeof AuthedOrgsSlugCoursesCourseIdRoute
+  '/orgs/$slug/courses/': typeof AuthedOrgsSlugCoursesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -207,13 +216,14 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
   '/orgs': typeof AuthedOrgsIndexRoute
-  '/orgs/$slug/courses': typeof AuthedOrgsSlugCoursesRoute
   '/orgs/$slug/event-groups': typeof AuthedOrgsSlugEventGroupsRoute
   '/orgs/$slug/events': typeof AuthedOrgsSlugEventsRoute
   '/orgs/$slug/members': typeof AuthedOrgsSlugMembersRoute
   '/orgs/$slug/settings': typeof AuthedOrgsSlugSettingsRoute
   '/orgs/$slug/timing-points': typeof AuthedOrgsSlugTimingPointsRoute
   '/orgs/$slug': typeof AuthedOrgsSlugIndexRoute
+  '/orgs/$slug/courses/$courseId': typeof AuthedOrgsSlugCoursesCourseIdRoute
+  '/orgs/$slug/courses': typeof AuthedOrgsSlugCoursesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -235,13 +245,14 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
   '/_authed/orgs/': typeof AuthedOrgsIndexRoute
-  '/_authed/orgs/$slug/courses': typeof AuthedOrgsSlugCoursesRoute
   '/_authed/orgs/$slug/event-groups': typeof AuthedOrgsSlugEventGroupsRoute
   '/_authed/orgs/$slug/events': typeof AuthedOrgsSlugEventsRoute
   '/_authed/orgs/$slug/members': typeof AuthedOrgsSlugMembersRoute
   '/_authed/orgs/$slug/settings': typeof AuthedOrgsSlugSettingsRoute
   '/_authed/orgs/$slug/timing-points': typeof AuthedOrgsSlugTimingPointsRoute
   '/_authed/orgs/$slug/': typeof AuthedOrgsSlugIndexRoute
+  '/_authed/orgs/$slug/courses/$courseId': typeof AuthedOrgsSlugCoursesCourseIdRoute
+  '/_authed/orgs/$slug/courses/': typeof AuthedOrgsSlugCoursesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -263,13 +274,14 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/shapes/hello-world'
     | '/orgs/'
-    | '/orgs/$slug/courses'
     | '/orgs/$slug/event-groups'
     | '/orgs/$slug/events'
     | '/orgs/$slug/members'
     | '/orgs/$slug/settings'
     | '/orgs/$slug/timing-points'
     | '/orgs/$slug/'
+    | '/orgs/$slug/courses/$courseId'
+    | '/orgs/$slug/courses/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -288,13 +300,14 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/shapes/hello-world'
     | '/orgs'
-    | '/orgs/$slug/courses'
     | '/orgs/$slug/event-groups'
     | '/orgs/$slug/events'
     | '/orgs/$slug/members'
     | '/orgs/$slug/settings'
     | '/orgs/$slug/timing-points'
     | '/orgs/$slug'
+    | '/orgs/$slug/courses/$courseId'
+    | '/orgs/$slug/courses'
   id:
     | '__root__'
     | '/'
@@ -315,13 +328,14 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/shapes/hello-world'
     | '/_authed/orgs/'
-    | '/_authed/orgs/$slug/courses'
     | '/_authed/orgs/$slug/event-groups'
     | '/_authed/orgs/$slug/events'
     | '/_authed/orgs/$slug/members'
     | '/_authed/orgs/$slug/settings'
     | '/_authed/orgs/$slug/timing-points'
     | '/_authed/orgs/$slug/'
+    | '/_authed/orgs/$slug/courses/$courseId'
+    | '/_authed/orgs/$slug/courses/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -474,13 +488,6 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof AuthedOrgsSlugIndexRouteImport
       parentRoute: typeof AuthedOrgsSlugRouteRoute
     }
-    '/_authed/orgs/$slug/courses': {
-      id: '/_authed/orgs/$slug/courses'
-      path: '/courses'
-      fullPath: '/orgs/$slug/courses'
-      preLoaderRoute: typeof AuthedOrgsSlugCoursesRouteImport
-      parentRoute: typeof AuthedOrgsSlugRouteRoute
-    }
     '/_authed/orgs/$slug/event-groups': {
       id: '/_authed/orgs/$slug/event-groups'
       path: '/event-groups'
@@ -516,27 +523,43 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof AuthedOrgsSlugTimingPointsRouteImport
       parentRoute: typeof AuthedOrgsSlugRouteRoute
     }
+    '/_authed/orgs/$slug/courses/': {
+      id: '/_authed/orgs/$slug/courses/'
+      path: '/courses'
+      fullPath: '/orgs/$slug/courses/'
+      preLoaderRoute: typeof AuthedOrgsSlugCoursesIndexRouteImport
+      parentRoute: typeof AuthedOrgsSlugRouteRoute
+    }
+    '/_authed/orgs/$slug/courses/$courseId': {
+      id: '/_authed/orgs/$slug/courses/$courseId'
+      path: '/courses/$courseId'
+      fullPath: '/orgs/$slug/courses/$courseId'
+      preLoaderRoute: typeof AuthedOrgsSlugCoursesCourseIdRouteImport
+      parentRoute: typeof AuthedOrgsSlugRouteRoute
+    }
   }
 }
 
 interface AuthedOrgsSlugRouteRouteChildren {
-  AuthedOrgsSlugCoursesRoute: typeof AuthedOrgsSlugCoursesRoute
   AuthedOrgsSlugEventGroupsRoute: typeof AuthedOrgsSlugEventGroupsRoute
   AuthedOrgsSlugEventsRoute: typeof AuthedOrgsSlugEventsRoute
   AuthedOrgsSlugMembersRoute: typeof AuthedOrgsSlugMembersRoute
   AuthedOrgsSlugSettingsRoute: typeof AuthedOrgsSlugSettingsRoute
   AuthedOrgsSlugTimingPointsRoute: typeof AuthedOrgsSlugTimingPointsRoute
   AuthedOrgsSlugIndexRoute: typeof AuthedOrgsSlugIndexRoute
+  AuthedOrgsSlugCoursesCourseIdRoute: typeof AuthedOrgsSlugCoursesCourseIdRoute
+  AuthedOrgsSlugCoursesIndexRoute: typeof AuthedOrgsSlugCoursesIndexRoute
 }
 
 const AuthedOrgsSlugRouteRouteChildren: AuthedOrgsSlugRouteRouteChildren = {
-  AuthedOrgsSlugCoursesRoute: AuthedOrgsSlugCoursesRoute,
   AuthedOrgsSlugEventGroupsRoute: AuthedOrgsSlugEventGroupsRoute,
   AuthedOrgsSlugEventsRoute: AuthedOrgsSlugEventsRoute,
   AuthedOrgsSlugMembersRoute: AuthedOrgsSlugMembersRoute,
   AuthedOrgsSlugSettingsRoute: AuthedOrgsSlugSettingsRoute,
   AuthedOrgsSlugTimingPointsRoute: AuthedOrgsSlugTimingPointsRoute,
   AuthedOrgsSlugIndexRoute: AuthedOrgsSlugIndexRoute,
+  AuthedOrgsSlugCoursesCourseIdRoute: AuthedOrgsSlugCoursesCourseIdRoute,
+  AuthedOrgsSlugCoursesIndexRoute: AuthedOrgsSlugCoursesIndexRoute,
 }
 
 const AuthedOrgsSlugRouteRouteWithChildren =
