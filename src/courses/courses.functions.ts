@@ -7,8 +7,10 @@ import {
 	createSplit,
 	deleteCourse,
 	deleteSplit,
+	generateStartFinishSplits,
 	getCoursePage,
 	moveSplit,
+	reorderCourseSplit,
 	updateCourse,
 	updateSplit,
 } from "./courses.server";
@@ -17,7 +19,9 @@ import {
 	courseIdInput,
 	createCourseInput,
 	createSplitInput,
+	generateStartFinishSplitsInput,
 	moveSplitInput,
+	reorderCourseSplitInput,
 	splitIdInput,
 	updateCourseInput,
 	updateSplitInput,
@@ -71,3 +75,17 @@ export const reorderSplit = createServerFn({ method: "POST" })
 	.middleware([authMiddleware])
 	.validator(moveSplitInput)
 	.handler(({ context, data }) => moveSplit(context.viewer, data));
+
+export const generateStartFinishSplitsEndpoint = createServerFn({
+	method: "POST",
+})
+	.middleware([authMiddleware])
+	.validator(generateStartFinishSplitsInput)
+	.handler(({ context, data }) =>
+		generateStartFinishSplits(context.viewer, data),
+	);
+
+export const reorderCourseSplitEndpoint = createServerFn({ method: "POST" })
+	.middleware([authMiddleware])
+	.validator(reorderCourseSplitInput)
+	.handler(({ context, data }) => reorderCourseSplit(context.viewer, data));

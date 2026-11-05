@@ -30,7 +30,7 @@ const DropdownMenuContent = <T extends ValidComponent = "div">(
 		<DropdownMenuPrimitive.Portal>
 			<DropdownMenuPrimitive.Content
 				class={cn(
-					"z-50 min-w-40 origin-(--kb-menu-content-transform-origin) animate-content-hide overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg backdrop-blur-md data-[expanded]:animate-content-show",
+					"z-50 min-w-40 origin-(--kb-menu-content-transform-origin) animate-content-hide overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg data-[expanded]:animate-content-show",
 					props.class,
 				)}
 				{...rest}
@@ -153,7 +153,7 @@ const DropdownMenuSubContent = <T extends ValidComponent = "div">(
 	return (
 		<DropdownMenuPrimitive.SubContent
 			class={cn(
-				"z-50 min-w-32 origin-(--kb-menu-content-transform-origin) overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg backdrop-blur-md animate-in",
+				"z-50 min-w-32 origin-(--kb-menu-content-transform-origin) overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg animate-in",
 				props.class,
 			)}
 			{...rest}

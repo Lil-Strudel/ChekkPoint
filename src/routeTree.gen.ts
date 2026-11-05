@@ -47,13 +47,28 @@ import { Route as AuthedEventGroupsEventGroupIdEventsRouteImport } from './route
 import { Route as AuthedEventGroupsEventGroupIdStaffRouteImport } from './routes/_authed/event-groups/$eventGroupId/staff'
 import { Route as AuthedEventGroupsEventGroupIdTimingRouteImport } from './routes/_authed/event-groups/$eventGroupId/timing'
 import { Route as AuthedOrgsSlugIndexRouteImport } from './routes/_authed/orgs/$slug/index'
-import { Route as AuthedOrgsSlugEventGroupsRouteImport } from './routes/_authed/orgs/$slug/event-groups'
+import { Route as AuthedOrgsSlugEventGroupsIndexRouteImport } from './routes/_authed/orgs/$slug/event-groups/index'
 import { Route as AuthedOrgsSlugEventsRouteImport } from './routes/_authed/orgs/$slug/events'
 import { Route as AuthedOrgsSlugMembersRouteImport } from './routes/_authed/orgs/$slug/members'
 import { Route as AuthedOrgsSlugSettingsRouteImport } from './routes/_authed/orgs/$slug/settings'
 import { Route as AuthedOrgsSlugTimingPointsRouteImport } from './routes/_authed/orgs/$slug/timing-points'
 import { Route as AuthedOrgsSlugCoursesIndexRouteImport } from './routes/_authed/orgs/$slug/courses/index'
 import { Route as AuthedOrgsSlugCoursesCourseIdRouteImport } from './routes/_authed/orgs/$slug/courses/$courseId'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/route'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugIndexRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/index'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/rules-staff'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/route'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/index'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/course'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/entrants'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/stations/index'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/stations/$timingPointId'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/logger'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugSarRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/sar'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/sar'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/audit'
+import { Route as AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRouteImport } from './routes/_authed/orgs/$slug/event-groups/$eventGroupSlug/raw-stream'
+import { Route as EventsSlugEntrantsEntrantIdRouteImport } from './routes/events/$slug/entrants/$entrantId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -211,6 +226,12 @@ const EventsSlugEntrantsRoute = EventsSlugEntrantsRouteImport.update({
   path: '/entrants',
   getParentRoute: () => EventsSlugRouteRoute,
 } as any)
+const EventsSlugEntrantsEntrantIdRoute =
+  EventsSlugEntrantsEntrantIdRouteImport.update({
+    id: '/entrants/$entrantId',
+    path: '/entrants/$entrantId',
+    getParentRoute: () => EventsSlugRouteRoute,
+  } as any)
 const EventsSlugResultsRoute = EventsSlugResultsRouteImport.update({
   id: '/results',
   path: '/results',
@@ -251,10 +272,10 @@ const AuthedOrgsSlugIndexRoute = AuthedOrgsSlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedOrgsSlugRouteRoute,
 } as any)
-const AuthedOrgsSlugEventGroupsRoute =
-  AuthedOrgsSlugEventGroupsRouteImport.update({
-    id: '/event-groups',
-    path: '/event-groups',
+const AuthedOrgsSlugEventGroupsIndexRoute =
+  AuthedOrgsSlugEventGroupsIndexRouteImport.update({
+    id: '/event-groups/',
+    path: '/event-groups/',
     getParentRoute: () => AuthedOrgsSlugRouteRoute,
   } as any)
 const AuthedOrgsSlugEventsRoute = AuthedOrgsSlugEventsRouteImport.update({
@@ -290,6 +311,97 @@ const AuthedOrgsSlugCoursesCourseIdRoute =
     path: '/courses/$courseId',
     getParentRoute: () => AuthedOrgsSlugRouteRoute,
   } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteImport.update({
+    id: '/event-groups/$eventGroupSlug',
+    path: '/event-groups/$eventGroupSlug',
+    getParentRoute: () => AuthedOrgsSlugRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugIndexRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRouteImport.update({
+    id: '/rules-staff',
+    path: '/rules-staff',
+    getParentRoute: () => AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteImport.update({
+    id: '/events/$eventId',
+    path: '/events/$eventId',
+    getParentRoute: () => AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () =>
+      AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRouteImport.update({
+    id: '/course',
+    path: '/course',
+    getParentRoute: () =>
+      AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRouteImport.update(
+    {
+      id: '/entrants',
+      path: '/entrants',
+      getParentRoute: () =>
+        AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute,
+    } as any,
+  )
+const AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRouteImport.update({
+    id: '/stations/',
+    path: '/stations/',
+    getParentRoute: () => AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRouteImport.update({
+    id: '/stations/$timingPointId',
+    path: '/stations/$timingPointId',
+    getParentRoute: () => AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRouteImport.update({
+    id: '/logger',
+    path: '/logger',
+    getParentRoute: () => AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugSarRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugSarRouteImport.update({
+    id: '/sar',
+    path: '/sar',
+    getParentRoute: () => AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRouteImport.update({
+    id: '/sar',
+    path: '/sar',
+    getParentRoute: () =>
+      AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRouteImport.update({
+    id: '/audit',
+    path: '/audit',
+    getParentRoute: () =>
+      AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute,
+  } as any)
+const AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRoute =
+  AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRouteImport.update({
+    id: '/raw-stream',
+    path: '/raw-stream',
+    getParentRoute: () => AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -321,13 +433,14 @@ export interface FileRoutesByFullPath {
   '/events/$slug/crew': typeof EventsSlugCrewRoute
   '/events/$slug/entrants': typeof EventsSlugEntrantsRoute
   '/events/$slug/results': typeof EventsSlugResultsRoute
+  '/events/$slug/entrants/$entrantId': typeof EventsSlugEntrantsEntrantIdRoute
   '/orgs/': typeof AuthedOrgsIndexRoute
   '/events/$slug/': typeof EventsSlugIndexRoute
   '/event-groups/$eventGroupId/entrants': typeof AuthedEventGroupsEventGroupIdEntrantsRoute
   '/event-groups/$eventGroupId/events': typeof AuthedEventGroupsEventGroupIdEventsRoute
   '/event-groups/$eventGroupId/staff': typeof AuthedEventGroupsEventGroupIdStaffRoute
   '/event-groups/$eventGroupId/timing': typeof AuthedEventGroupsEventGroupIdTimingRoute
-  '/orgs/$slug/event-groups': typeof AuthedOrgsSlugEventGroupsRoute
+  '/orgs/$slug/event-groups/': typeof AuthedOrgsSlugEventGroupsIndexRoute
   '/orgs/$slug/events': typeof AuthedOrgsSlugEventsRoute
   '/orgs/$slug/members': typeof AuthedOrgsSlugMembersRoute
   '/orgs/$slug/settings': typeof AuthedOrgsSlugSettingsRoute
@@ -336,6 +449,20 @@ export interface FileRoutesByFullPath {
   '/orgs/$slug/': typeof AuthedOrgsSlugIndexRoute
   '/orgs/$slug/courses/$courseId': typeof AuthedOrgsSlugCoursesCourseIdRoute
   '/orgs/$slug/courses/': typeof AuthedOrgsSlugCoursesIndexRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug': typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteWithChildren
+  '/orgs/$slug/event-groups/$eventGroupSlug/': typeof AuthedOrgsSlugEventGroupsEventGroupSlugIndexRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/rules-staff': typeof AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteWithChildren
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/course': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/entrants': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/stations/': typeof AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/stations/$timingPointId': typeof AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/logger': typeof AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/sar': typeof AuthedOrgsSlugEventGroupsEventGroupSlugSarRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/sar': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/audit': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/raw-stream': typeof AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -364,13 +491,14 @@ export interface FileRoutesByTo {
   '/events/$slug/crew': typeof EventsSlugCrewRoute
   '/events/$slug/entrants': typeof EventsSlugEntrantsRoute
   '/events/$slug/results': typeof EventsSlugResultsRoute
+  '/events/$slug/entrants/$entrantId': typeof EventsSlugEntrantsEntrantIdRoute
   '/orgs': typeof AuthedOrgsIndexRoute
   '/events/$slug': typeof EventsSlugIndexRoute
   '/event-groups/$eventGroupId/entrants': typeof AuthedEventGroupsEventGroupIdEntrantsRoute
   '/event-groups/$eventGroupId/events': typeof AuthedEventGroupsEventGroupIdEventsRoute
   '/event-groups/$eventGroupId/staff': typeof AuthedEventGroupsEventGroupIdStaffRoute
   '/event-groups/$eventGroupId/timing': typeof AuthedEventGroupsEventGroupIdTimingRoute
-  '/orgs/$slug/event-groups': typeof AuthedOrgsSlugEventGroupsRoute
+  '/orgs/$slug/event-groups': typeof AuthedOrgsSlugEventGroupsIndexRoute
   '/orgs/$slug/events': typeof AuthedOrgsSlugEventsRoute
   '/orgs/$slug/members': typeof AuthedOrgsSlugMembersRoute
   '/orgs/$slug/settings': typeof AuthedOrgsSlugSettingsRoute
@@ -379,6 +507,18 @@ export interface FileRoutesByTo {
   '/orgs/$slug': typeof AuthedOrgsSlugIndexRoute
   '/orgs/$slug/courses/$courseId': typeof AuthedOrgsSlugCoursesCourseIdRoute
   '/orgs/$slug/courses': typeof AuthedOrgsSlugCoursesIndexRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug': typeof AuthedOrgsSlugEventGroupsEventGroupSlugIndexRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/rules-staff': typeof AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/course': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/entrants': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/stations': typeof AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/stations/$timingPointId': typeof AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/logger': typeof AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/sar': typeof AuthedOrgsSlugEventGroupsEventGroupSlugSarRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/sar': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/audit': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRoute
+  '/orgs/$slug/event-groups/$eventGroupSlug/raw-stream': typeof AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -412,13 +552,14 @@ export interface FileRoutesById {
   '/events/$slug/crew': typeof EventsSlugCrewRoute
   '/events/$slug/entrants': typeof EventsSlugEntrantsRoute
   '/events/$slug/results': typeof EventsSlugResultsRoute
+  '/events/$slug/entrants/$entrantId': typeof EventsSlugEntrantsEntrantIdRoute
   '/_authed/orgs/': typeof AuthedOrgsIndexRoute
   '/events/$slug/': typeof EventsSlugIndexRoute
   '/_authed/event-groups/$eventGroupId/entrants': typeof AuthedEventGroupsEventGroupIdEntrantsRoute
   '/_authed/event-groups/$eventGroupId/events': typeof AuthedEventGroupsEventGroupIdEventsRoute
   '/_authed/event-groups/$eventGroupId/staff': typeof AuthedEventGroupsEventGroupIdStaffRoute
   '/_authed/event-groups/$eventGroupId/timing': typeof AuthedEventGroupsEventGroupIdTimingRoute
-  '/_authed/orgs/$slug/event-groups': typeof AuthedOrgsSlugEventGroupsRoute
+  '/_authed/orgs/$slug/event-groups/': typeof AuthedOrgsSlugEventGroupsIndexRoute
   '/_authed/orgs/$slug/events': typeof AuthedOrgsSlugEventsRoute
   '/_authed/orgs/$slug/members': typeof AuthedOrgsSlugMembersRoute
   '/_authed/orgs/$slug/settings': typeof AuthedOrgsSlugSettingsRoute
@@ -427,6 +568,20 @@ export interface FileRoutesById {
   '/_authed/orgs/$slug/': typeof AuthedOrgsSlugIndexRoute
   '/_authed/orgs/$slug/courses/$courseId': typeof AuthedOrgsSlugCoursesCourseIdRoute
   '/_authed/orgs/$slug/courses/': typeof AuthedOrgsSlugCoursesIndexRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug': typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteWithChildren
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/': typeof AuthedOrgsSlugEventGroupsEventGroupSlugIndexRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/rules-staff': typeof AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteWithChildren
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/course': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/entrants': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/stations/': typeof AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/stations/$timingPointId': typeof AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/logger': typeof AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/sar': typeof AuthedOrgsSlugEventGroupsEventGroupSlugSarRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/sar': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/audit': typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRoute
+  '/_authed/orgs/$slug/event-groups/$eventGroupSlug/raw-stream': typeof AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -475,6 +630,13 @@ export interface FileRouteTypes {
     | '/orgs/$slug/'
     | '/orgs/$slug/courses/$courseId'
     | '/orgs/$slug/courses/'
+    | '/orgs/$slug/event-groups/$eventGroupSlug'
+    | '/orgs/$slug/event-groups/$eventGroupSlug/'
+    | '/orgs/$slug/event-groups/$eventGroupSlug/rules-staff'
+    | '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId'
+    | '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/'
+    | '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/course'
+    | '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/entrants'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -518,6 +680,11 @@ export interface FileRouteTypes {
     | '/orgs/$slug'
     | '/orgs/$slug/courses/$courseId'
     | '/orgs/$slug/courses'
+    | '/orgs/$slug/event-groups/$eventGroupSlug'
+    | '/orgs/$slug/event-groups/$eventGroupSlug/rules-staff'
+    | '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId'
+    | '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/course'
+    | '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/entrants'
   id:
     | '__root__'
     | '/'
@@ -565,6 +732,13 @@ export interface FileRouteTypes {
     | '/_authed/orgs/$slug/'
     | '/_authed/orgs/$slug/courses/$courseId'
     | '/_authed/orgs/$slug/courses/'
+    | '/_authed/orgs/$slug/event-groups/$eventGroupSlug'
+    | '/_authed/orgs/$slug/event-groups/$eventGroupSlug/'
+    | '/_authed/orgs/$slug/event-groups/$eventGroupSlug/rules-staff'
+    | '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId'
+    | '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/'
+    | '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/course'
+    | '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/entrants'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -817,6 +991,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof EventsSlugResultsRouteImport
       parentRoute: typeof EventsSlugRouteRoute
     }
+    '/events/$slug/entrants/$entrantId': {
+      id: '/events/$slug/entrants/$entrantId'
+      path: '/entrants/$entrantId'
+      fullPath: '/events/$slug/entrants/$entrantId'
+      preLoaderRoute: typeof EventsSlugEntrantsEntrantIdRouteImport
+      parentRoute: typeof EventsSlugRouteRoute
+    }
     '/_authed/event-groups/$eventGroupId/': {
       id: '/_authed/event-groups/$eventGroupId/'
       path: '/'
@@ -859,11 +1040,11 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof AuthedOrgsSlugIndexRouteImport
       parentRoute: typeof AuthedOrgsSlugRouteRoute
     }
-    '/_authed/orgs/$slug/event-groups': {
-      id: '/_authed/orgs/$slug/event-groups'
+    '/_authed/orgs/$slug/event-groups/': {
+      id: '/_authed/orgs/$slug/event-groups/'
       path: '/event-groups'
-      fullPath: '/orgs/$slug/event-groups'
-      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsRouteImport
+      fullPath: '/orgs/$slug/event-groups/'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsIndexRouteImport
       parentRoute: typeof AuthedOrgsSlugRouteRoute
     }
     '/_authed/orgs/$slug/events': {
@@ -908,6 +1089,104 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof AuthedOrgsSlugCoursesCourseIdRouteImport
       parentRoute: typeof AuthedOrgsSlugRouteRoute
     }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug'
+      path: '/event-groups/$eventGroupSlug'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteImport
+      parentRoute: typeof AuthedOrgsSlugRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/'
+      path: '/'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugIndexRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/rules-staff': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/rules-staff'
+      path: '/rules-staff'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/rules-staff'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/'
+      path: '/'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/course': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/course'
+      path: '/course'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/course'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/entrants': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/entrants'
+      path: '/entrants'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/entrants'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/stations/': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/stations/'
+      path: '/stations'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/stations'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/stations/$timingPointId': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/stations/$timingPointId'
+      path: '/stations/$timingPointId'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/stations/$timingPointId'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/logger': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/logger'
+      path: '/logger'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/logger'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/sar': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/sar'
+      path: '/sar'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/sar'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugSarRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/sar': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/sar'
+      path: '/sar'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/sar'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/audit': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/audit'
+      path: '/audit'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/events/$eventId/audit'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute
+    }
+    '/_authed/orgs/$slug/event-groups/$eventGroupSlug/raw-stream': {
+      id: '/_authed/orgs/$slug/event-groups/$eventGroupSlug/raw-stream'
+      path: '/raw-stream'
+      fullPath: '/orgs/$slug/event-groups/$eventGroupSlug/raw-stream'
+      preLoaderRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRouteImport
+      parentRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute
+    }
   }
 }
 
@@ -938,8 +1217,71 @@ const AuthedEventGroupsEventGroupIdRouteRouteWithChildren =
     AuthedEventGroupsEventGroupIdRouteRouteChildren,
   )
 
+interface AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteChildren {
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRoute
+}
+
+const AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteChildren: AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteChildren =
+  {
+    AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdIndexRoute,
+    AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdCourseRoute,
+    AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdEntrantsRoute,
+    AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdSarRoute,
+    AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdAuditRoute,
+  }
+
+const AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteWithChildren =
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute._addFileChildren(
+    AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteChildren,
+  )
+
+interface AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteChildren {
+  AuthedOrgsSlugEventGroupsEventGroupSlugIndexRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugIndexRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteWithChildren
+  AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugSarRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugSarRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRoute
+}
+
+const AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteChildren: AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteChildren =
+  {
+    AuthedOrgsSlugEventGroupsEventGroupSlugIndexRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugIndexRoute,
+    AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugRulesStaffRoute,
+    AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugEventsEventIdRouteRouteWithChildren,
+    AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugStationsIndexRoute,
+    AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugStationsTimingPointIdRoute,
+    AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugLoggerRoute,
+    AuthedOrgsSlugEventGroupsEventGroupSlugSarRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugSarRoute,
+    AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRoute:
+      AuthedOrgsSlugEventGroupsEventGroupSlugRawStreamRoute,
+  }
+
+const AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteWithChildren =
+  AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute._addFileChildren(
+    AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteChildren,
+  )
+
 interface AuthedOrgsSlugRouteRouteChildren {
-  AuthedOrgsSlugEventGroupsRoute: typeof AuthedOrgsSlugEventGroupsRoute
+  AuthedOrgsSlugEventGroupsIndexRoute: typeof AuthedOrgsSlugEventGroupsIndexRoute
   AuthedOrgsSlugEventsRoute: typeof AuthedOrgsSlugEventsRoute
   AuthedOrgsSlugMembersRoute: typeof AuthedOrgsSlugMembersRoute
   AuthedOrgsSlugSettingsRoute: typeof AuthedOrgsSlugSettingsRoute
@@ -947,10 +1289,11 @@ interface AuthedOrgsSlugRouteRouteChildren {
   AuthedOrgsSlugIndexRoute: typeof AuthedOrgsSlugIndexRoute
   AuthedOrgsSlugCoursesCourseIdRoute: typeof AuthedOrgsSlugCoursesCourseIdRoute
   AuthedOrgsSlugCoursesIndexRoute: typeof AuthedOrgsSlugCoursesIndexRoute
+  AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute: typeof AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteWithChildren
 }
 
 const AuthedOrgsSlugRouteRouteChildren: AuthedOrgsSlugRouteRouteChildren = {
-  AuthedOrgsSlugEventGroupsRoute: AuthedOrgsSlugEventGroupsRoute,
+  AuthedOrgsSlugEventGroupsIndexRoute: AuthedOrgsSlugEventGroupsIndexRoute,
   AuthedOrgsSlugEventsRoute: AuthedOrgsSlugEventsRoute,
   AuthedOrgsSlugMembersRoute: AuthedOrgsSlugMembersRoute,
   AuthedOrgsSlugSettingsRoute: AuthedOrgsSlugSettingsRoute,
@@ -958,6 +1301,8 @@ const AuthedOrgsSlugRouteRouteChildren: AuthedOrgsSlugRouteRouteChildren = {
   AuthedOrgsSlugIndexRoute: AuthedOrgsSlugIndexRoute,
   AuthedOrgsSlugCoursesCourseIdRoute: AuthedOrgsSlugCoursesCourseIdRoute,
   AuthedOrgsSlugCoursesIndexRoute: AuthedOrgsSlugCoursesIndexRoute,
+  AuthedOrgsSlugEventGroupsEventGroupSlugRouteRoute:
+    AuthedOrgsSlugEventGroupsEventGroupSlugRouteRouteWithChildren,
 }
 
 const AuthedOrgsSlugRouteRouteWithChildren =
@@ -990,6 +1335,7 @@ interface EventsSlugRouteRouteChildren {
   EventsSlugCourseRoute: typeof EventsSlugCourseRoute
   EventsSlugCrewRoute: typeof EventsSlugCrewRoute
   EventsSlugEntrantsRoute: typeof EventsSlugEntrantsRoute
+  EventsSlugEntrantsEntrantIdRoute: typeof EventsSlugEntrantsEntrantIdRoute
   EventsSlugResultsRoute: typeof EventsSlugResultsRoute
   EventsSlugIndexRoute: typeof EventsSlugIndexRoute
 }
@@ -998,6 +1344,7 @@ const EventsSlugRouteRouteChildren: EventsSlugRouteRouteChildren = {
   EventsSlugCourseRoute: EventsSlugCourseRoute,
   EventsSlugCrewRoute: EventsSlugCrewRoute,
   EventsSlugEntrantsRoute: EventsSlugEntrantsRoute,
+  EventsSlugEntrantsEntrantIdRoute: EventsSlugEntrantsEntrantIdRoute,
   EventsSlugResultsRoute: EventsSlugResultsRoute,
   EventsSlugIndexRoute: EventsSlugIndexRoute,
 }

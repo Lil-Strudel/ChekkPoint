@@ -1,5 +1,5 @@
 import "@tanstack/solid-start/server-only";
-import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { orgRolesCan } from "../auth/access";
 import { findOrCreatePerson } from "../auth/people.server";
@@ -15,6 +15,7 @@ import type { Viewer } from "../auth/session.server";
 import { db } from "../db";
 import { withConstraintMessages } from "../db/errors.server";
 import {
+	courseSplits,
 	courses,
 	eventGroupStaff,
 	eventGroupStaffTimingPoints,
@@ -29,16 +30,21 @@ import {
 	timingPoints,
 	users,
 } from "../db/schema";
-import type {
-	assignStaffInput,
-	createEventGroupInput,
-	createTimingPointInput,
-	recordTimeInput,
-	removeStaffInput,
-	timingPointIdInput,
-	updateTimingPointInput,
+import { mergeOrganizationMetadata } from "./format";
+import { parseOrganizationMeta } from "../public/public.shared";
+import {
+	type assignStaffInput,
+	type createEventGroupInput,
+	type createTimingPointInput,
+	type deleteEventGroupInput,
+	type recordTimeInput,
+	type removeStaffInput,
+	slugify,
+	type timingPointIdInput,
+	type updateEventGroupInput,
+	type updateOrganizationDetailsInput,
+	type updateTimingPointInput,
 } from "./orgs.shared";
-import { slugify } from "./orgs.shared";
 
 export async function listMyOrganizations(viewer: Viewer) {
 	const memberships = await db
@@ -80,48 +86,130 @@ export async function listMyOrganizations(viewer: Viewer) {
 	return { memberships, staffing };
 }
 
+function getDefaultRulesConfig(discipline: string) {
+	switch (discipline) {
+		case "backyard_ultra":
+			return RulesConfigSchema.parse({
+				timeFormat: "HH:MM:SS",
+				displayPrecisionDecimals: 0,
+				yardDistanceMiles: 4.166667,
+				yardTimeLimitSeconds: 3600,
+				allowSelfCheckIn: false,
+				requirePacerRegistration: false,
+			});
+		case "tsd_regularity":
+			return RulesConfigSchema.parse({
+				timeFormat: "HH:MM:SS.sss",
+				displayPrecisionDecimals: 3,
+				earlyPenaltyFactor: 2.0,
+				latePenaltyFactor: 1.0,
+				gracePeriodSeconds: 0.0,
+				allowSelfCheckIn: false,
+				requirePacerRegistration: false,
+			});
+		case "downhill_mtb":
+		case "xco_cycling":
+			return RulesConfigSchema.parse({
+				timeFormat: "MM:SS.sss",
+				displayPrecisionDecimals: 2,
+				allowSelfCheckIn: false,
+				requirePacerRegistration: false,
+			});
+		case "trail_ultra":
+			return RulesConfigSchema.parse({
+				timeFormat: "HH:MM:SS",
+				displayPrecisionDecimals: 0,
+				allowSelfCheckIn: true,
+				requirePacerRegistration: true,
+			});
+		case "road_marathon":
+			return RulesConfigSchema.parse({
+				timeFormat: "HH:MM:SS",
+				displayPrecisionDecimals: 0,
+				allowSelfCheckIn: true,
+				requirePacerRegistration: false,
+			});
+		default:
+			return RulesConfigSchema.parse({});
+	}
+}
+
 export async function getOrganizationOverview(viewer: Viewer, slug: string) {
 	const [org] = await db
 		.select({
 			id: organizations.id,
 			name: organizations.name,
 			slug: organizations.slug,
+			logo: organizations.logo,
+			metadata: organizations.metadata,
 		})
 		.from(organizations)
 		.where(eq(organizations.slug, slug));
 	if (!org) return null;
 
 	const myRoles = await getOrgRoles(viewer.user.id, org.id);
-	if (myRoles.length === 0) return null;
+
+	let staffEventGroups: Array<{
+		id: string;
+		name: string;
+		slug: string;
+		roles: string[];
+	}> = [];
+
+	if (viewer.person?.id) {
+		staffEventGroups = await db
+			.select({
+				id: eventGroups.id,
+				name: eventGroups.name,
+				slug: eventGroups.slug,
+				roles: eventGroupStaff.roles,
+			})
+			.from(eventGroupStaff)
+			.innerJoin(eventGroups, eq(eventGroups.id, eventGroupStaff.eventGroupId))
+			.where(
+				and(
+					eq(eventGroups.organizationId, org.id),
+					eq(eventGroupStaff.personId, viewer.person.id),
+				),
+			);
+	}
+
+	if (myRoles.length === 0 && staffEventGroups.length === 0) {
+		return null;
+	}
+
+	const isStaffOnly = myRoles.length === 0;
 
 	const can = {
-		invite: orgRolesCan(myRoles, "invitation", "create"),
-		updateMembers: orgRolesCan(myRoles, "member", "update"),
-		createEventGroup: orgRolesCan(myRoles, "eventGroup", "create"),
-		createCourse: orgRolesCan(myRoles, "course", "create"),
-		updateCourse: orgRolesCan(myRoles, "course", "update"),
-		deleteCourse: orgRolesCan(myRoles, "course", "delete"),
-		createTimingPoint: orgRolesCan(myRoles, "timingPoint", "create"),
-		updateTimingPoint: orgRolesCan(myRoles, "timingPoint", "update"),
-		deleteTimingPoint: orgRolesCan(myRoles, "timingPoint", "delete"),
-		updateOrganization: orgRolesCan(myRoles, "organization", "update"),
-		deleteOrganization: orgRolesCan(myRoles, "organization", "delete"),
+		invite: !isStaffOnly && orgRolesCan(myRoles, "invitation", "create"),
+		updateMembers: !isStaffOnly && orgRolesCan(myRoles, "member", "update"),
+		createEventGroup: !isStaffOnly && orgRolesCan(myRoles, "eventGroup", "create"),
+		createCourse: !isStaffOnly && orgRolesCan(myRoles, "course", "create"),
+		updateCourse: !isStaffOnly && orgRolesCan(myRoles, "course", "update"),
+		deleteCourse: !isStaffOnly && orgRolesCan(myRoles, "course", "delete"),
+		createTimingPoint: !isStaffOnly && orgRolesCan(myRoles, "timingPoint", "create"),
+		updateTimingPoint: !isStaffOnly && orgRolesCan(myRoles, "timingPoint", "update"),
+		deleteTimingPoint: !isStaffOnly && orgRolesCan(myRoles, "timingPoint", "delete"),
+		updateOrganization: !isStaffOnly && orgRolesCan(myRoles, "organization", "update"),
+		deleteOrganization: !isStaffOnly && orgRolesCan(myRoles, "organization", "delete"),
 	};
 
 	const [members, invitations, groups, points, orgCourses, orgEvents] =
 		await Promise.all([
-			db
-				.select({
-					id: organizationMembers.id,
-					userId: users.id,
-					name: users.name,
-					email: users.email,
-					role: organizationMembers.role,
-				})
-				.from(organizationMembers)
-				.innerJoin(users, eq(users.id, organizationMembers.userId))
-				.where(eq(organizationMembers.organizationId, org.id))
-				.orderBy(asc(users.name)),
+			!isStaffOnly
+				? db
+						.select({
+							id: organizationMembers.id,
+							userId: users.id,
+							name: users.name,
+							email: users.email,
+							role: organizationMembers.role,
+						})
+						.from(organizationMembers)
+						.innerJoin(users, eq(users.id, organizationMembers.userId))
+						.where(eq(organizationMembers.organizationId, org.id))
+						.orderBy(asc(users.name))
+				: Promise.resolve([]),
 			can.invite
 				? db
 						.select({
@@ -142,36 +230,46 @@ export async function getOrganizationOverview(viewer: Viewer, slug: string) {
 				.select({
 					id: eventGroups.id,
 					name: eventGroups.name,
+					slug: eventGroups.slug,
 					discipline: eventGroups.discipline,
 					startDate: eventGroups.startDate,
 					endDate: eventGroups.endDate,
+					timeZone: eventGroups.timeZone,
 					location: eventGroups.location,
+					eventCount: sql<number>`(select count(*) from ${events} where ${events.eventGroupId} = ${eventGroups.id})`.mapWith(Number),
 				})
 				.from(eventGroups)
 				.where(eq(eventGroups.organizationId, org.id))
 				.orderBy(desc(eventGroups.startDate)),
-			db
-				.select({
-					id: timingPoints.id,
-					name: timingPoints.name,
-					code: timingPoints.code,
-					latitude: timingPoints.latitude,
-					longitude: timingPoints.longitude,
-					elevationMeters: timingPoints.elevationMeters,
-				})
-				.from(timingPoints)
-				.where(eq(timingPoints.organizationId, org.id))
-				.orderBy(asc(timingPoints.code)),
-			db
-				.select({
-					id: courses.id,
-					name: courses.name,
-					distanceMeters: courses.distanceMeters,
-					elevationGainMeters: courses.elevationGainMeters,
-				})
-				.from(courses)
-				.where(eq(courses.organizationId, org.id))
-				.orderBy(asc(courses.name)),
+			!isStaffOnly
+				? db
+						.select({
+							id: timingPoints.id,
+							name: timingPoints.name,
+							code: timingPoints.code,
+							latitude: timingPoints.latitude,
+							longitude: timingPoints.longitude,
+							elevationMeters: timingPoints.elevationMeters,
+						})
+						.from(timingPoints)
+						.where(eq(timingPoints.organizationId, org.id))
+						.orderBy(asc(timingPoints.code))
+				: Promise.resolve([]),
+			!isStaffOnly
+				? db
+						.select({
+							id: courses.id,
+							name: courses.name,
+							distanceMeters: courses.distanceMeters,
+							elevationGainMeters: courses.elevationGainMeters,
+							gpxRouteUrl: courses.gpxRouteUrl,
+							copiedFromCourseId: courses.copiedFromCourseId,
+							splitCount: sql<number>`(select count(*) from ${courseSplits} where ${courseSplits.courseId} = ${courses.id})`.mapWith(Number),
+						})
+						.from(courses)
+						.where(eq(courses.organizationId, org.id))
+						.orderBy(asc(courses.name))
+				: Promise.resolve([]),
 			db
 				.select({
 					id: events.id,
@@ -179,6 +277,7 @@ export async function getOrganizationOverview(viewer: Viewer, slug: string) {
 					eventGroupId: eventGroups.id,
 					eventGroupName: eventGroups.name,
 					timeZone: eventGroups.timeZone,
+					courseId: events.courseId,
 					courseName: courses.name,
 					scheduledStart: events.scheduledStart,
 					lapsRequired: events.lapsRequired,
@@ -190,9 +289,16 @@ export async function getOrganizationOverview(viewer: Viewer, slug: string) {
 				.orderBy(desc(events.scheduledStart)),
 		]);
 
+	const parsedMeta = parseOrganizationMeta(org.metadata);
+
 	return {
-		organization: org,
+		organization: {
+			...org,
+			parsedMeta,
+		},
 		myRoles,
+		isStaffOnly,
+		staffEventGroups,
 		can,
 		members,
 		invitations,
@@ -213,21 +319,171 @@ export async function createEventGroup(
 		"eventGroup",
 		"create",
 	);
+
+	const slug = data.slug ? slugify(data.slug) : slugify(data.name);
+
+	// Validate slug uniqueness within organization
+	const [existingSlug] = await db
+		.select({ id: eventGroups.id })
+		.from(eventGroups)
+		.where(
+			and(
+				eq(eventGroups.organizationId, data.organizationId),
+				eq(eventGroups.slug, slug),
+			),
+		);
+	if (existingSlug) {
+		throw new Error(
+			"An event group with this address (slug) already exists in this organization.",
+		);
+	}
+
+	const rulesConfig = getDefaultRulesConfig(data.discipline);
+
 	const [group] = await db
 		.insert(eventGroups)
 		.values({
 			organizationId: data.organizationId,
 			name: data.name,
-			slug: slugify(data.name),
+			slug,
 			discipline: data.discipline,
 			timeZone: data.timeZone,
 			location: data.location,
-			rulesConfig: RulesConfigSchema.parse({}),
+			rulesConfig,
 			startDate: new Date(data.startDate),
 			endDate: new Date(data.endDate),
 		})
-		.returning({ id: eventGroups.id });
+		.returning({ id: eventGroups.id, slug: eventGroups.slug });
 	return group;
+}
+
+export async function updateEventGroup(
+	viewer: Viewer,
+	data: z.infer<typeof updateEventGroupInput>,
+) {
+	const access = await getEventGroupAccess(viewer, data.eventGroupId);
+	if (!access || !access.can.editEventGroup) {
+		throw new ForbiddenError();
+	}
+
+	const [current] = await db
+		.select({
+			id: eventGroups.id,
+			organizationId: eventGroups.organizationId,
+			slug: eventGroups.slug,
+		})
+		.from(eventGroups)
+		.where(eq(eventGroups.id, data.eventGroupId));
+	if (!current) throw new Error("Event group not found");
+
+	const slug = data.slug ? slugify(data.slug) : current.slug;
+
+	if (slug !== current.slug) {
+		const [existingSlug] = await db
+			.select({ id: eventGroups.id })
+			.from(eventGroups)
+			.where(
+				and(
+					eq(eventGroups.organizationId, current.organizationId),
+					eq(eventGroups.slug, slug),
+				),
+			);
+		if (existingSlug) {
+			throw new Error(
+				"An event group with this address (slug) already exists in this organization.",
+			);
+		}
+	}
+
+	await db
+		.update(eventGroups)
+		.set({
+			name: data.name,
+			slug,
+			discipline: data.discipline,
+			startDate: new Date(data.startDate),
+			endDate: new Date(data.endDate),
+			timeZone: data.timeZone,
+			location: data.location,
+		})
+		.where(eq(eventGroups.id, data.eventGroupId));
+}
+
+export async function deleteEventGroup(
+	viewer: Viewer,
+	data: z.infer<typeof deleteEventGroupInput>,
+) {
+	const access = await getEventGroupAccess(viewer, data.eventGroupId);
+	if (!access || !access.can.editEventGroup) {
+		throw new ForbiddenError();
+	}
+
+	// Pre-check sub-events
+	const [subEvents] = await db
+		.select({ count: count() })
+		.from(events)
+		.where(eq(events.eventGroupId, data.eventGroupId));
+	if (subEvents && subEvents.count > 0) {
+		throw new Error(
+			`Cannot delete event group because it contains ${subEvents.count} sub-event(s). Delete them first.`,
+		);
+	}
+
+	await db
+		.delete(eventGroups)
+		.where(eq(eventGroups.id, data.eventGroupId));
+}
+
+export async function updateOrganizationDetails(
+	viewer: Viewer,
+	data: z.infer<typeof updateOrganizationDetailsInput>,
+) {
+	await requireOrgPermission(
+		viewer,
+		data.organizationId,
+		"organization",
+		"update",
+	);
+
+	const [existing] = await db
+		.select({
+			id: organizations.id,
+			slug: organizations.slug,
+			metadata: organizations.metadata,
+		})
+		.from(organizations)
+		.where(eq(organizations.id, data.organizationId));
+	if (!existing) throw new Error("Organization not found");
+
+	if (data.slug !== existing.slug) {
+		const [conflict] = await db
+			.select({ id: organizations.id })
+			.from(organizations)
+			.where(eq(organizations.slug, data.slug));
+		if (conflict) {
+			throw new Error(
+				"An organization with that address (slug) already exists.",
+			);
+		}
+	}
+
+	const updatedMetadata = mergeOrganizationMetadata(existing.metadata, {
+		description: data.description,
+		location: data.location,
+		timeZone: data.timeZone,
+		website: data.website,
+		establishedYear: data.establishedYear,
+	});
+
+	await db
+		.update(organizations)
+		.set({
+			name: data.name,
+			slug: data.slug,
+			logo: data.logo ?? null,
+			metadata: updatedMetadata,
+		})
+		.where(eq(organizations.id, data.organizationId));
 }
 
 const timingPointConstraints = {
@@ -285,6 +541,59 @@ export async function deleteTimingPoint(
 	data: z.infer<typeof timingPointIdInput>,
 ) {
 	await requireTimingPointPermission(viewer, data.timingPointId, "delete");
+
+	// First query the timing point by id to obtain code and organizationId
+	const [point] = await db
+		.select({
+			id: timingPoints.id,
+			code: timingPoints.code,
+			organizationId: timingPoints.organizationId,
+		})
+		.from(timingPoints)
+		.where(eq(timingPoints.id, data.timingPointId));
+
+	if (!point) {
+		throw new Error("Timing point not found");
+	}
+
+	// Pre-check reference counts in course_splits, event_group_staff_timing_points, and raw_timing_events
+	const [splitsRef] = await db
+		.select({ count: count() })
+		.from(courseSplits)
+		.where(eq(courseSplits.timingPointId, data.timingPointId));
+
+	const [staffRef] = await db
+		.select({ count: count() })
+		.from(eventGroupStaffTimingPoints)
+		.where(eq(eventGroupStaffTimingPoints.timingPointId, data.timingPointId));
+
+	const [rawEventsRef] = await db
+		.select({ count: count() })
+		.from(rawTimingEvents)
+		.innerJoin(eventGroups, eq(eventGroups.id, rawTimingEvents.eventGroupId))
+		.where(
+			and(
+				eq(eventGroups.organizationId, point.organizationId),
+				eq(rawTimingEvents.timingPointCode, point.code),
+			),
+		);
+
+	const totalRefs =
+		(splitsRef?.count ?? 0) +
+		(staffRef?.count ?? 0) +
+		(rawEventsRef?.count ?? 0);
+
+	if (totalRefs > 0) {
+		const parts: string[] = [];
+		if (splitsRef?.count) parts.push(`${splitsRef.count} course split(s)`);
+		if (staffRef?.count) parts.push(`${staffRef.count} staff assignment(s)`);
+		if (rawEventsRef?.count)
+			parts.push(`${rawEventsRef.count} raw timing record(s)`);
+		throw new Error(
+			`Cannot delete timing point because it is referenced by ${parts.join(", ")}. Remove or reassign them first.`,
+		);
+	}
+
 	await withConstraintMessages(timingPointConstraints, () =>
 		db.delete(timingPoints).where(eq(timingPoints.id, data.timingPointId)),
 	);

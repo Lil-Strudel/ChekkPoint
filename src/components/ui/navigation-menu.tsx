@@ -30,7 +30,7 @@ export const NavigationMenu = <T extends ValidComponent = "ul">(
 			{...others}
 		>
 			{local.children}
-			<NavigationMenuPrimitive.Viewport class="origin-top relative mt-1.5 h-[var(--kb-navigation-menu-viewport-height)] w-full overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg backdrop-blur-md transition-[width,height] duration-300" />
+			<NavigationMenuPrimitive.Viewport class="origin-top relative mt-1.5 h-[var(--kb-navigation-menu-viewport-height)] w-full overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg transition-[width,height] duration-300" />
 		</NavigationMenuPrimitive.Root>
 	);
 };

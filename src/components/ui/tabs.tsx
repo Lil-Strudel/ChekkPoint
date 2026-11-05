@@ -40,7 +40,7 @@ export const TabsTrigger = <T extends ValidComponent = "button">(
 		<TabsPrimitive.Trigger
 			data-slot="tabs-trigger"
 			class={cn(
-				"inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold transition-all cursor-pointer focus-visible:outline-hidden focus-visible:ring-ring/40 focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-50 hover:text-foreground data-[selected]:bg-surface data-[selected]:text-foreground data-[selected]:shadow-xs",
+				"inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors cursor-pointer focus-visible:outline-hidden focus-visible:ring-ring/40 focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-50 hover:text-foreground data-[selected]:bg-surface data-[selected]:text-foreground data-[selected]:shadow-xs",
 				local.class,
 			)}
 			{...others}
@@ -82,7 +82,7 @@ export const TabsIndicator = <T extends ValidComponent = "div">(
 		<TabsPrimitive.Indicator
 			data-slot="tabs-indicator"
 			class={cn(
-				"absolute bg-forest transition-all duration-200 data-[orientation=horizontal]:-bottom-px data-[orientation=vertical]:-right-px data-[orientation=horizontal]:h-0.5 data-[orientation=vertical]:w-0.5",
+				"absolute bg-forest transition-[left,top,width,height] duration-200 data-[orientation=horizontal]:-bottom-px data-[orientation=vertical]:-right-px data-[orientation=horizontal]:h-0.5 data-[orientation=vertical]:w-0.5",
 				local.class,
 			)}
 			{...others}

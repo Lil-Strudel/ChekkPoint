@@ -1,6 +1,9 @@
-import { Link } from "@tanstack/solid-router";
+import { Link, useNavigate } from "@tanstack/solid-router";
+import { createSignal } from "solid-js";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
 import {
 	Progress,
 	ProgressLabel,
@@ -18,12 +21,25 @@ export default function LiveEventCard(props: {
 	group: EnrichedPublicEventGroup;
 	now: Date;
 }) {
+	const navigate = useNavigate();
+	const [lookupBib, setLookupBib] = createSignal("");
+
 	const elapsedHours = () => {
 		const startMs = new Date(props.group.startDate).getTime();
 		return Math.max(0, (props.now.getTime() - startMs) / 3_600_000);
 	};
 
 	const discMeta = () => DISCIPLINE_META[props.group.discipline];
+
+	const handleBibLookup = (e: Event) => {
+		e.preventDefault();
+		const b = lookupBib().trim();
+		if (!b) return;
+		navigate({
+			to: "/events/$slug/results",
+			params: { slug: props.group.slug },
+		});
+	};
 
 	return (
 		<Card class="flex flex-col gap-5 border-clay/40 p-6">
@@ -84,6 +100,28 @@ export default function LiveEventCard(props: {
 					<ProgressValueLabel class="text-xs font-semibold tabular-nums" />
 				</div>
 			</Progress>
+
+			{/* Bib Quick-Search Track Form */}
+			<form
+				onSubmit={handleBibLookup}
+				class="flex items-center gap-2 pt-2 border-t border-border/50"
+			>
+				<Input
+					type="search"
+					placeholder="Track Bib # (e.g. 101)…"
+					value={lookupBib()}
+					onInput={(e) => setLookupBib(e.currentTarget.value)}
+					class="h-8 text-xs font-mono"
+				/>
+				<Button
+					type="submit"
+					size="sm"
+					variant="outline"
+					class="h-8 px-3 text-xs font-semibold shrink-0"
+				>
+					Track →
+				</Button>
+			</form>
 
 			<div>
 				<Link

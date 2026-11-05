@@ -5,23 +5,29 @@ import {
 	assignStaff,
 	createEventGroup,
 	createTimingPoint,
+	deleteEventGroup,
 	deleteTimingPoint,
 	getEventGroupPage,
 	getOrganizationOverview,
 	listMyOrganizations,
 	recordTime,
 	removeStaff,
+	updateEventGroup,
+	updateOrganizationDetails,
 	updateTimingPoint,
 } from "./orgs.server";
 import {
 	assignStaffInput,
 	createEventGroupInput,
 	createTimingPointInput,
+	deleteEventGroupInput,
 	eventGroupIdInput,
 	recordTimeInput,
 	removeStaffInput,
 	slugInput,
 	timingPointIdInput,
+	updateEventGroupInput,
+	updateOrganizationDetailsInput,
 	updateTimingPointInput,
 } from "./orgs.shared";
 
@@ -42,6 +48,23 @@ export const addEventGroup = createServerFn({ method: "POST" })
 	.middleware([authMiddleware])
 	.validator(createEventGroupInput)
 	.handler(({ context, data }) => createEventGroup(context.viewer, data));
+
+export const editEventGroup = createServerFn({ method: "POST" })
+	.middleware([authMiddleware])
+	.validator(updateEventGroupInput)
+	.handler(({ context, data }) => updateEventGroup(context.viewer, data));
+
+export const removeEventGroup = createServerFn({ method: "POST" })
+	.middleware([authMiddleware])
+	.validator(deleteEventGroupInput)
+	.handler(({ context, data }) => deleteEventGroup(context.viewer, data));
+
+export const editOrganizationDetails = createServerFn({ method: "POST" })
+	.middleware([authMiddleware])
+	.validator(updateOrganizationDetailsInput)
+	.handler(({ context, data }) =>
+		updateOrganizationDetails(context.viewer, data),
+	);
 
 export const addTimingPoint = createServerFn({ method: "POST" })
 	.middleware([authMiddleware])

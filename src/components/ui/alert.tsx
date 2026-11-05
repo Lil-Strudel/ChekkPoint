@@ -6,7 +6,7 @@ import { splitProps } from "solid-js";
 import { cn } from "~/lib/utils";
 
 export const alertVariants = cva(
-	"relative w-full rounded-2xl border p-4 text-sm transition-all overflow-hidden",
+	"relative w-full rounded-2xl border p-4 text-sm overflow-hidden",
 	{
 		variants: {
 			variant: {

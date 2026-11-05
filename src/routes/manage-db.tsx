@@ -154,7 +154,7 @@ function ManageDbPage() {
 						<Link
 							to="/manage-db"
 							search={{ collection: "overview", view: "schema" }}
-							class={`w-full flex items-center justify-between p-3 rounded-2xl border text-sm font-semibold transition-all ${
+							class={`w-full flex items-center justify-between p-3 rounded-2xl border text-sm font-semibold transition-colors ${
 								activeCollectionId() === "overview"
 									? "border-forest bg-card text-foreground shadow-xs"
 									: "border-border bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground"
@@ -199,7 +199,7 @@ function ManageDbPage() {
 																		collection: col.id,
 																		view: activeView(),
 																	}}
-																	class={`group flex flex-col p-2.5 rounded-xl border text-left transition-all ${
+																	class={`group flex flex-col p-2.5 rounded-xl border text-left transition-colors ${
 																		isSelected()
 																			? "border-forest bg-card text-foreground shadow-xs"
 																			: "border-transparent bg-card/40 text-muted-foreground hover:border-border hover:bg-card/80 hover:text-foreground"
@@ -528,7 +528,7 @@ function DomainOverviewView(props: {
 				<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
 					<For each={COLLECTIONS}>
 						{(col) => (
-							<Card class="p-5 flex flex-col justify-between hover:border-forest transition-all">
+							<Card class="p-5 flex flex-col justify-between hover:border-forest transition-colors">
 								<div>
 									<div class="flex items-center justify-between gap-2 mb-2">
 										<Badge variant="chip" class="text-[10px] py-0.5">
@@ -631,7 +631,7 @@ function CollectionSchemaView(props: { collection: CollectionMetadata }) {
 									}}
 									class="group"
 								>
-									<Card class="p-4 hover:border-forest transition-all flex flex-col justify-between h-full">
+									<Card class="p-4 hover:border-forest transition-colors flex flex-col justify-between h-full">
 										<div>
 											<div class="flex items-center justify-between mb-1">
 												<Badge

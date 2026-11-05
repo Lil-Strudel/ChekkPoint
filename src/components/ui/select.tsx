@@ -69,7 +69,7 @@ export const SelectContent = <T extends ValidComponent = "div">(
 			<SelectPrimitive.Content
 				data-slot="select-content"
 				class={cn(
-					"bg-popover text-popover-foreground relative z-50 min-w-32 overflow-hidden rounded-xl border border-border shadow-lg backdrop-blur-md animate-in fade-in-80",
+					"bg-popover text-popover-foreground relative z-50 min-w-32 overflow-hidden rounded-xl border border-border shadow-lg animate-in fade-in-80",
 					local.class,
 				)}
 				{...others}
