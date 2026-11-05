@@ -28,6 +28,7 @@ import { Route as AuthedOrgsNewRouteImport } from './routes/_authed/orgs/new'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiShapesHelloWorldRouteImport } from './routes/api/shapes/hello-world'
 import { Route as AuthedEventGroupsEventGroupIdIndexRouteImport } from './routes/_authed/event-groups/$eventGroupId/index'
+import { Route as AuthedEventGroupsEventGroupIdEntrantsRouteImport } from './routes/_authed/event-groups/$eventGroupId/entrants'
 import { Route as AuthedEventGroupsEventGroupIdEventsRouteImport } from './routes/_authed/event-groups/$eventGroupId/events'
 import { Route as AuthedEventGroupsEventGroupIdStaffRouteImport } from './routes/_authed/event-groups/$eventGroupId/staff'
 import { Route as AuthedEventGroupsEventGroupIdTimingRouteImport } from './routes/_authed/event-groups/$eventGroupId/timing'
@@ -137,6 +138,12 @@ const AuthedEventGroupsEventGroupIdIndexRoute =
     path: '/',
     getParentRoute: () => AuthedEventGroupsEventGroupIdRouteRoute,
   } as any)
+const AuthedEventGroupsEventGroupIdEntrantsRoute =
+  AuthedEventGroupsEventGroupIdEntrantsRouteImport.update({
+    id: '/entrants',
+    path: '/entrants',
+    getParentRoute: () => AuthedEventGroupsEventGroupIdRouteRoute,
+  } as any)
 const AuthedEventGroupsEventGroupIdEventsRoute =
   AuthedEventGroupsEventGroupIdEventsRouteImport.update({
     id: '/events',
@@ -218,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
   '/orgs/': typeof AuthedOrgsIndexRoute
+  '/event-groups/$eventGroupId/entrants': typeof AuthedEventGroupsEventGroupIdEntrantsRoute
   '/event-groups/$eventGroupId/events': typeof AuthedEventGroupsEventGroupIdEventsRoute
   '/event-groups/$eventGroupId/staff': typeof AuthedEventGroupsEventGroupIdStaffRoute
   '/event-groups/$eventGroupId/timing': typeof AuthedEventGroupsEventGroupIdTimingRoute
@@ -247,6 +255,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
   '/orgs': typeof AuthedOrgsIndexRoute
+  '/event-groups/$eventGroupId/entrants': typeof AuthedEventGroupsEventGroupIdEntrantsRoute
   '/event-groups/$eventGroupId/events': typeof AuthedEventGroupsEventGroupIdEventsRoute
   '/event-groups/$eventGroupId/staff': typeof AuthedEventGroupsEventGroupIdStaffRoute
   '/event-groups/$eventGroupId/timing': typeof AuthedEventGroupsEventGroupIdTimingRoute
@@ -280,6 +289,7 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
   '/_authed/orgs/': typeof AuthedOrgsIndexRoute
+  '/_authed/event-groups/$eventGroupId/entrants': typeof AuthedEventGroupsEventGroupIdEntrantsRoute
   '/_authed/event-groups/$eventGroupId/events': typeof AuthedEventGroupsEventGroupIdEventsRoute
   '/_authed/event-groups/$eventGroupId/staff': typeof AuthedEventGroupsEventGroupIdStaffRoute
   '/_authed/event-groups/$eventGroupId/timing': typeof AuthedEventGroupsEventGroupIdTimingRoute
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/shapes/hello-world'
     | '/orgs/'
+    | '/event-groups/$eventGroupId/entrants'
     | '/event-groups/$eventGroupId/events'
     | '/event-groups/$eventGroupId/staff'
     | '/event-groups/$eventGroupId/timing'
@@ -342,6 +353,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/shapes/hello-world'
     | '/orgs'
+    | '/event-groups/$eventGroupId/entrants'
     | '/event-groups/$eventGroupId/events'
     | '/event-groups/$eventGroupId/staff'
     | '/event-groups/$eventGroupId/timing'
@@ -374,6 +386,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/shapes/hello-world'
     | '/_authed/orgs/'
+    | '/_authed/event-groups/$eventGroupId/entrants'
     | '/_authed/event-groups/$eventGroupId/events'
     | '/_authed/event-groups/$eventGroupId/staff'
     | '/_authed/event-groups/$eventGroupId/timing'
@@ -538,6 +551,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof AuthedEventGroupsEventGroupIdIndexRouteImport
       parentRoute: typeof AuthedEventGroupsEventGroupIdRouteRoute
     }
+    '/_authed/event-groups/$eventGroupId/entrants': {
+      id: '/_authed/event-groups/$eventGroupId/entrants'
+      path: '/entrants'
+      fullPath: '/event-groups/$eventGroupId/entrants'
+      preLoaderRoute: typeof AuthedEventGroupsEventGroupIdEntrantsRouteImport
+      parentRoute: typeof AuthedEventGroupsEventGroupIdRouteRoute
+    }
     '/_authed/event-groups/$eventGroupId/events': {
       id: '/_authed/event-groups/$eventGroupId/events'
       path: '/events'
@@ -619,6 +639,7 @@ declare module '@tanstack/solid-router' {
 }
 
 interface AuthedEventGroupsEventGroupIdRouteRouteChildren {
+  AuthedEventGroupsEventGroupIdEntrantsRoute: typeof AuthedEventGroupsEventGroupIdEntrantsRoute
   AuthedEventGroupsEventGroupIdEventsRoute: typeof AuthedEventGroupsEventGroupIdEventsRoute
   AuthedEventGroupsEventGroupIdStaffRoute: typeof AuthedEventGroupsEventGroupIdStaffRoute
   AuthedEventGroupsEventGroupIdTimingRoute: typeof AuthedEventGroupsEventGroupIdTimingRoute
@@ -627,6 +648,8 @@ interface AuthedEventGroupsEventGroupIdRouteRouteChildren {
 
 const AuthedEventGroupsEventGroupIdRouteRouteChildren: AuthedEventGroupsEventGroupIdRouteRouteChildren =
   {
+    AuthedEventGroupsEventGroupIdEntrantsRoute:
+      AuthedEventGroupsEventGroupIdEntrantsRoute,
     AuthedEventGroupsEventGroupIdEventsRoute:
       AuthedEventGroupsEventGroupIdEventsRoute,
     AuthedEventGroupsEventGroupIdStaffRoute:

@@ -30,6 +30,11 @@ export const Route = createFileRoute("/_authed/event-groups/$eventGroupId")({
 const sections = [
 	{ to: "/event-groups/$eventGroupId", label: "Overview", exact: true },
 	{ to: "/event-groups/$eventGroupId/events", label: "Events" },
+	{
+		to: "/event-groups/$eventGroupId/entrants",
+		label: "Entrants",
+		members: true,
+	},
 	{ to: "/event-groups/$eventGroupId/staff", label: "Staff", members: true },
 	{ to: "/event-groups/$eventGroupId/timing", label: "Timing" },
 ] as const;
