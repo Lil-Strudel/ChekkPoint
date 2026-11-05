@@ -7,10 +7,10 @@ import {
 	Scripts,
 	useRouter,
 } from "@tanstack/solid-router";
-import { TanStackRouterDevtools } from "@tanstack/solid-router-devtools";
 import { type JSX, Suspense } from "solid-js";
 import { HydrationScript } from "solid-js/web";
 import { getViewer } from "../auth/session.functions";
+import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { Button, buttonVariants } from "../components/ui/button";
 import styleCss from "../styles.css?url";
@@ -53,7 +53,7 @@ function RootComponent(props: { children: JSX.Element }) {
 				<Suspense>
 					<Header />
 					{props.children}
-					<TanStackRouterDevtools />
+					<Footer />
 				</Suspense>
 				<Scripts />
 			</body>
