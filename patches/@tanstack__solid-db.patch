@@ -1,0 +1,18 @@
+diff --git a/dist/esm/store-materialization.js b/dist/esm/store-materialization.js
+index 8236cee36cbfff7abe012c54ceff4c9155309821..ef415a05dc06acb57571aaca1b027281fea70f2e 100644
+--- a/dist/esm/store-materialization.js
++++ b/dist/esm/store-materialization.js
+@@ -69,11 +69,11 @@ function createRowStore(source) {
+         } : { ...desc, configurable: true }
+       );
+     }
+-    for (const key of /* @__PURE__ */ new Set([...keys(target), `__proto__`])) {
++    for (const key of keys(target)) {
+       const descriptor = Object.getOwnPropertyDescriptor(target, key);
+       if (descriptor && !(`value` in descriptor)) continue;
+       const initialValue = descriptor?.value;
+-      if (typeof initialValue !== `function` && key !== `__proto__`) continue;
++      if (typeof initialValue !== `function`) continue;
+       if (!descriptor)
+         Object.defineProperty(target, key, {
+           value: void 0,

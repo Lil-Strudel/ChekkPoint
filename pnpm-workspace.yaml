@@ -5,6 +5,8 @@ allowBuilds:
   '@journeyapps/wa-sqlite': false
   esbuild: true
   lightningcss: true
+patchedDependencies:
+  '@tanstack/solid-db': patches/@tanstack__solid-db.patch
 permissions:
   '@electric-sql/client':
     skills: true
