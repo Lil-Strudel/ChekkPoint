@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isTimeZone } from "../lib/zoned-time";
 
 export const STAFF_ROLES = [
 	"volunteer",
@@ -62,13 +63,25 @@ export const slugInput = z.object({ slug: z.string().min(1) });
 
 export const eventGroupIdInput = z.object({ eventGroupId: z.uuid() });
 
-export const createEventGroupInput = z.object({
-	organizationId: z.uuid(),
+export const eventGroupFields = {
 	name: z.string().trim().min(1),
 	discipline: z.enum(DISCIPLINES),
 	startDate: z.iso.date(),
 	endDate: z.iso.date(),
-});
+	timeZone: z.string().refine(isTimeZone, "Pick a time zone from the list."),
+	location: z
+		.string()
+		.trim()
+		.transform((l) => l || null)
+		.nullable(),
+};
+
+export const createEventGroupInput = z
+	.object({ organizationId: z.uuid(), ...eventGroupFields })
+	.refine((g) => g.endDate >= g.startDate, {
+		message: "The event group can't end before it starts.",
+		path: ["endDate"],
+	});
 
 const optionalNumber = z.number().nullable();
 
