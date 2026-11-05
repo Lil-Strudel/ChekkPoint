@@ -7,6 +7,10 @@ allowBuilds:
   lightningcss: true
 patchedDependencies:
   '@tanstack/solid-db': patches/@tanstack__solid-db.patch
+skills:
+  dirs:
+    - .agent/skills
+    - .claude/skills
 permissions:
   '@electric-sql/client':
     skills: true
