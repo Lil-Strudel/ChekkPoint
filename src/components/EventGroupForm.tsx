@@ -1,4 +1,4 @@
-import { createSignal, type JSX } from "solid-js";
+import { createSignal, For, type JSX } from "solid-js";
 import ActionError from "~/components/ActionError";
 import FormField from "~/components/FormField";
 import FormSelect from "~/components/FormSelect";
@@ -22,9 +22,7 @@ const disciplineOptions = DISCIPLINES.map((value) => ({
 }));
 
 const zones = Intl.supportedValuesOf("timeZone");
-const timeZoneOptions = (zones.includes("UTC") ? zones : ["UTC", ...zones]).map(
-	(zone) => ({ value: zone, label: zone.replaceAll("_", " ") }),
-);
+const timeZones = zones.includes("UTC") ? zones : ["UTC", ...zones];
 
 // Event group dates are calendar days stored as UTC midnight.
 export function dayInputValue(date: Date) {
@@ -95,12 +93,17 @@ export default function EventGroupForm(props: {
 						onChange={setEndDate}
 					/>
 				</div>
-				<FormSelect
+				<FormField
 					label="Time zone"
 					value={timeZone()}
 					onChange={setTimeZone}
-					options={timeZoneOptions}
+					list="time-zones"
+					description="Start typing a city, like Denver."
+					required
 				/>
+				<datalist id="time-zones">
+					<For each={timeZones}>{(zone) => <option value={zone} />}</For>
+				</datalist>
 				<FormField
 					label="Location"
 					value={location()}
