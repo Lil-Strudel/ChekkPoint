@@ -6,7 +6,7 @@ import { splitProps } from "solid-js";
 import { cn } from "~/lib/utils";
 
 export const buttonVariants = cva(
-	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all focus-visible:outline-hidden focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-colors focus-visible:outline-hidden focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
 	{
 		variants: {
 			variant: {
@@ -15,7 +15,7 @@ export const buttonVariants = cva(
 				destructive:
 					"bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-xs",
 				outline:
-					"border border-border bg-background/60 text-foreground hover:bg-accent hover:text-accent-foreground backdrop-blur-xs shadow-xs",
+					"border border-border bg-background/80 text-foreground hover:bg-accent hover:text-accent-foreground shadow-xs",
 				secondary:
 					"bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border shadow-xs",
 				ghost:

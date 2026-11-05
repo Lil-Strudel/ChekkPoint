@@ -15,8 +15,7 @@ export const badgeVariants = cva(
 				secondary:
 					"border-border bg-secondary text-secondary-foreground shadow-xs",
 				destructive: "border-destructive/30 bg-destructive/15 text-destructive",
-				outline:
-					"border-border bg-secondary/60 text-foreground backdrop-blur-xs",
+				outline: "border-border bg-secondary/80 text-foreground",
 				forest: "border-forest/30 bg-forest/15 text-forest",
 				sage: "border-sage/40 bg-sage/20 text-forest-deep",
 				clay: "border-clay/30 bg-clay/15 text-clay",

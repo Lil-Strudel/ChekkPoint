@@ -11,7 +11,7 @@ export const Card = (props: CardProps) => {
 		<div
 			data-slot="card"
 			class={cn(
-				"bg-card text-card-foreground rounded-lg border border-border shadow-glass backdrop-blur-glass backdrop-saturate-110 transition-all relative overflow-hidden",
+				"bg-card text-card-foreground rounded-lg border border-border shadow-glass transition-shadow relative overflow-hidden",
 				local.class,
 			)}
 			{...others}
