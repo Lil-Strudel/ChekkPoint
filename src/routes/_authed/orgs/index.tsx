@@ -4,7 +4,7 @@ import { ORG_ROLE_LABELS, parseOrgRoles } from "~/auth/access";
 import EmptyState from "~/components/EmptyState";
 import OrgSection from "~/components/OrgSection";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
+import { buttonVariants } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { getMyOrganizations } from "~/orgs/orgs.functions";
 import { STAFF_ROLE_LABELS } from "~/orgs/orgs.shared";
@@ -37,17 +37,17 @@ function Organizations() {
 							title="No organizations yet"
 							description="Create one for the club, series or company that puts on your races. You'll be its owner."
 						>
-							<Button as={Link} to="/orgs/new">
+							<Link to="/orgs/new" class={buttonVariants()}>
 								New organization
-							</Button>
+							</Link>
 						</EmptyState>
 					}
 				>
 					<section>
 						<div class="mb-8">
-							<Button as={Link} to="/orgs/new">
+							<Link to="/orgs/new" class={buttonVariants()}>
 								New organization
-							</Button>
+							</Link>
 						</div>
 						<ul class="m-0 grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2">
 							<For each={data().memberships}>

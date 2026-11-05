@@ -7,7 +7,7 @@ import {
 import { Show } from "solid-js";
 import { authClient } from "~/auth/client";
 import type { Viewer } from "~/auth/session.server";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -38,9 +38,12 @@ export default function UserMenu() {
 		<Show
 			when={context().viewer}
 			fallback={
-				<Button as={Link} to="/sign-in" variant="pill" size="pill">
+				<Link
+					to="/sign-in"
+					class={buttonVariants({ variant: "pill", size: "pill" })}
+				>
 					Sign in
-				</Button>
+				</Link>
 			}
 		>
 			{(viewer) => (

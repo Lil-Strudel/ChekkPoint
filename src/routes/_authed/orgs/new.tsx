@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/solid-router";
 import { authClient } from "~/auth/client";
 import OrgForm, { orgFormErrors } from "~/components/OrgForm";
-import { Button } from "~/components/ui/button";
+import { buttonVariants } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import type { OrganizationInput } from "~/orgs/orgs.shared";
 
@@ -29,9 +29,9 @@ function NewOrg() {
 
 			<Card class="max-w-xl p-6">
 				<OrgForm submitLabel="Create organization" onSubmit={create}>
-					<Button as={Link} to="/orgs" variant="ghost">
+					<Link to="/orgs" class={buttonVariants({ variant: "ghost" })}>
 						Cancel
-					</Button>
+					</Link>
 				</OrgForm>
 			</Card>
 		</main>

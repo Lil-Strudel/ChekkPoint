@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/solid-router";
 import { For, Show } from "solid-js";
 import LiveEventCard from "~/components/LiveEventCard";
 import UpcomingEventRow from "~/components/UpcomingEventRow";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { getHomeEvents } from "~/lib/mock-events";
 
@@ -56,9 +56,12 @@ function Home() {
 						<Button as="a" href="#upcoming" size="lg">
 							Upcoming races
 						</Button>
-						<Button as={Link} to="/about" variant="outline" size="lg">
+						<Link
+							to="/about"
+							class={buttonVariants({ variant: "outline", size: "lg" })}
+						>
 							How it works
-						</Button>
+						</Link>
 					</div>
 				</div>
 
