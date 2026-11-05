@@ -1,18 +1,43 @@
 {
-  "version": "8",
+  "type": "base",
+  "version": "9",
   "dialect": "postgres",
   "id": "35ddbb1c-731d-42b1-b770-108d6f61cd55",
   "prevIds": [
     "00000000-0000-0000-0000-000000000000"
   ],
+  "footprints": [
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "hello_world"
+      ],
+      "writes": [
+        "s|tbl|public.hello_world",
+        "n|tbl|public.hello_world",
+        "e|tbl|public.hello_world",
+        "n|rel|public.hello_world",
+        "n|type|public.hello_world",
+        "n|rel|public.hello_world_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    }
+  ],
   "ddl": [
     {
-      "isRlsEnabled": false,
+      "schema": "public",
       "name": "hello_world",
-      "entityType": "tables",
-      "schema": "public"
+      "isRlsEnabled": false,
+      "entityType": "tables"
     },
     {
+      "schema": "public",
+      "table": "hello_world",
+      "name": "id",
       "type": "integer",
       "typeSchema": null,
       "notNull": true,
@@ -29,12 +54,12 @@
         "cache": 1,
         "cycle": false
       },
-      "name": "id",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "hello_world"
+      "entityType": "columns"
     },
     {
+      "schema": "public",
+      "table": "hello_world",
+      "name": "message",
       "type": "varchar(255)",
       "typeSchema": null,
       "notNull": true,
@@ -42,25 +67,12 @@
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "message",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "hello_world"
+      "entityType": "columns"
     },
     {
-      "type": "timestamp",
-      "typeSchema": null,
-      "notNull": true,
-      "dimensions": 0,
-      "default": "now()",
-      "generated": null,
-      "identity": null,
+      "schema": "public",
+      "table": "hello_world",
       "name": "created_at",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "hello_world"
-    },
-    {
       "type": "timestamp",
       "typeSchema": null,
       "notNull": true,
@@ -68,21 +80,30 @@
       "default": "now()",
       "generated": null,
       "identity": null,
-      "name": "updated_at",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "hello_world"
+      "entityType": "columns"
     },
     {
+      "schema": "public",
+      "table": "hello_world",
+      "name": "updated_at",
+      "type": "timestamp",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "hello_world",
+      "name": "hello_world_pkey",
       "columns": [
         "id"
       ],
       "nameExplicit": false,
-      "name": "hello_world_pkey",
-      "schema": "public",
-      "table": "hello_world",
       "entityType": "pks"
     }
-  ],
-  "renames": []
+  ]
 }
