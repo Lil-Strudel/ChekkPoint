@@ -203,6 +203,10 @@ All application UI is built from genuine `solid-ui` components located in `src/c
 | `<Checkbox>` | `ui/checkbox.tsx` | `@kobalte/core/checkbox` | Children render as the Kobalte label. `rounded-sm` (4px) so it never reads as a radio. |
 | `<DropdownMenu>` | `ui/dropdown-menu.tsx` | `@kobalte/core/dropdown-menu` | Full solid-ui suite (items, labels, separators, sub-menus, checkbox/radio items). Used for the header user menu. |
 | `<FormSelect>` | `FormSelect.tsx` | `ui/select.tsx` | Labelled select over `{ value, label }` options for forms. |
+| `<FormField>` | `FormField.tsx` | `ui/text-field.tsx` | Labelled text, number, date or multiline field with an optional description and `datalist`. |
+| `<ActionError>` | `ActionError.tsx` | `ui/alert.tsx` | Destructive alert that renders only when a server action failed. |
+| `<ConfirmButton>` | `ConfirmButton.tsx` | `ui/button.tsx` | Inline two-step delete: a ghost button that turns into "… for good" / "Keep it". Stub-grade; the settings danger zone still uses its own larger version. |
+| `<CourseForm>`, `<EventGroupForm>` | `CourseForm.tsx`, `EventGroupForm.tsx` | `FormField`, `FormSelect` | Shared create/edit forms (miles and feet in, meters stored). |
 
 ### Nav Link Design Rationale
 Header navigation in `Header.tsx` preserves `.nav-link` with its sliding 1.5px forest underline transition (`::after`, `scaleX` 0→1) rather than stock button pills. This directly matches the starlink.com editorial design ethos established in ChekkPoint's foundations.
@@ -241,7 +245,9 @@ All transitions, animations, and smooth scroll behaviors automatically collapse 
 | `/redis` | Migrated to solid-ui `<Card>`, `<Alert>`, `<Badge>`, `<Button>`; added socket timeout (2s) | Verified at 1440px (graceful error banner when Redis is offline) |
 | `/hello` | Migrated to solid-ui `<Card>`, `<Input>`, `<Button>`, `<Badge>` | Verified SSR/client structure (Electric requires Docker) |
 | `/sign-in`, `/sign-up`, `/forgot-password`, `/reset-password` | Built on `<Card>`, `<Tabs>`, `<TextField>`, `<Alert>` | Verified at 1440px |
-| `/event-groups/$id`, `/account` | Built on `<Card>`, `<Table>`, `<Checkbox>`, `<FormSelect>`, `<Badge>` | Verified owner, director and volunteer views at 1440px |
+| `/account` | Built on `<Card>`, `<Table>`, `<Checkbox>`, `<FormSelect>`, `<Badge>` | Verified owner, director and volunteer views at 1440px |
+| `/event-groups/$id/*` | **Stub.** Hub with `.nav-link` tabs: Overview (details, rules, delete), Events, Entrants (form + CSV import), Staff, Timing. Unpolished inline-card forms | Director flow scripted end to end at 1440px; member view checked; not checked at 390px |
+| `/orgs/$slug/courses/$courseId` | **Stub.** Course edit/copy/delete and ordered split table | Scripted end to end at 1440px; not checked at 390px |
 | `/orgs`, `/orgs/new` | Org cards, staffing, and the create form (`OrgForm` on `<TextField>`, slug follows the name until edited) | Verified at 1440px; create, taken and reserved slugs scripted end to end |
 | `/orgs/$slug/*` | Org workspace: `.nav-link` sub-nav (wraps on mobile) over Overview, Event groups, Events, Courses, Timing points, Members, Settings; `OrgSection`, `EmptyState`, `DateBlock`, `<Table>`, `<Badge>` | Verified owner and timing-steward views at 1440px, sub-nav at 390px |
 
