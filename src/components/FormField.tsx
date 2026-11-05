@@ -16,6 +16,7 @@ type FormFieldProps = {
 	required?: boolean;
 	multiline?: boolean;
 	step?: string;
+	list?: string;
 	class?: string;
 };
 
@@ -35,6 +36,7 @@ export default function FormField(props: FormFieldProps) {
 					type={props.type ?? "text"}
 					step={props.step ?? (props.type === "number" ? "any" : undefined)}
 					placeholder={props.placeholder}
+					list={props.list}
 				/>
 			)}
 			{props.description && (
