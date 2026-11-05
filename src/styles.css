@@ -114,9 +114,9 @@
 	/* solid-ui standard theme tokens mapped to ChekkPoint palette */
 	--background: var(--paper);
 	--foreground: var(--ink);
-	--card: rgba(250, 248, 243, 0.78);
+	--card: rgba(250, 248, 243, 0.96);
 	--card-foreground: var(--ink);
-	--popover: rgba(250, 248, 243, 0.95);
+	--popover: #faf8f3;
 	--popover-foreground: var(--ink);
 	--primary: var(--forest);
 	--primary-foreground: #ffffff;
@@ -198,14 +198,13 @@
 				transparent 60%
 			);
 		background-size: auto, auto;
-		background-attachment: fixed;
 		background-position: center;
 		overflow-x: hidden;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 	}
 
-	/* Fine topographic contour layer (loaded once, GPU-composited, fixed) */
+	/* Fine topographic contour layer (loaded once, contained, fixed) */
 	body::before {
 		content: "";
 		position: fixed;
@@ -214,7 +213,6 @@
 		pointer-events: none;
 		background: url("/topo.svg") center / cover no-repeat;
 		opacity: 0.65;
-		will-change: transform;
 		contain: strict;
 	}
 
@@ -247,8 +245,7 @@
 
 /* Flat, editorial header */
 .site-header {
-	position: sticky;
-	top: 0;
+	position: relative;
 	z-index: 50;
 	width: min(1280px, calc(100% - 4rem));
 	margin-inline: auto;

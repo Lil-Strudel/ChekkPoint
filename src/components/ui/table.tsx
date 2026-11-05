@@ -13,7 +13,7 @@ export const Table = (props: TableProps) => {
 		<div
 			data-slot="table-container"
 			class={cn(
-				"relative w-full overflow-x-auto rounded-2xl border border-border bg-card/60 backdrop-blur-xs",
+				"relative w-full overflow-x-auto rounded-2xl border border-border bg-card",
 				local.containerClass,
 			)}
 		>
