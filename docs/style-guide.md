@@ -187,7 +187,7 @@ All application UI is built from genuine `solid-ui` components located in `src/c
 
 | Component | Source File | Kobalte Primitive | Variants / Notes |
 |---|---|---|---|
-| `<Button>` | `ui/button.tsx` | `@kobalte/core/button` | `default`, `destructive`, `outline`, `secondary`, `ghost`, `link`, `pill`. Sizes: `default`, `sm`, `lg`, `icon`, `pill`. Supports polymorphic `as={Link}`. |
+| `<Button>` | `ui/button.tsx` | `@kobalte/core/button` | `default`, `destructive`, `outline`, `secondary`, `ghost`, `link`, `pill`. Sizes: `default`, `sm`, `lg`, `icon`, `pill`. For a link that looks like a button, use `<Link class={buttonVariants(...)}>`, not `as={Link}`: Link reads `disabled` from event handlers, where Kobalte's getter creates an unowned memo. |
 | `<Card>` | `ui/card.tsx` | Native polymorphic | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`, `CardAction`. Glass default styling built in. |
 | `<Badge>` | `ui/badge.tsx` | `@kobalte/core/badge` | `default`, `secondary`, `destructive`, `outline`, `forest`, `sage`, `clay`, `sand`, `chip`. |
 | `<Separator>` | `ui/separator.tsx` | `@kobalte/core/separator` | Horizontal or vertical hairline dividers. |

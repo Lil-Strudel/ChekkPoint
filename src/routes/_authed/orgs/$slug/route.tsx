@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet } from "@tanstack/solid-router";
 import { For } from "solid-js";
 import { ORG_ROLE_LABELS } from "~/auth/access";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
+import { buttonVariants } from "~/components/ui/button";
 import { getOrganization } from "~/orgs/orgs.functions";
 
 export const Route = createFileRoute("/_authed/orgs/$slug")({
@@ -73,9 +73,9 @@ function OrgNotFound() {
 				There's no organization at /orgs/{params().slug}, or you're not a member
 				of it.
 			</p>
-			<Button as={Link} to="/orgs" variant="outline">
+			<Link to="/orgs" class={buttonVariants({ variant: "outline" })}>
 				Your organizations
-			</Button>
+			</Link>
 		</main>
 	);
 }
