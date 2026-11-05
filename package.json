@@ -2,6 +2,7 @@
   "name": "chekkpoint",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@12.14.0",
   "scripts": {
     "dev": "pnpm services:up && vite dev --port 3000",
     "generate-routes": "tsr generate",
