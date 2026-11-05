@@ -6,6 +6,7 @@ import {
 	Link,
 	Scripts,
 	useRouter,
+	useLocation,
 } from "@tanstack/solid-router";
 import { type JSX, Suspense } from "solid-js";
 import { HydrationScript } from "solid-js/web";
@@ -43,6 +44,11 @@ export const Route = createRootRouteWithContext()({
 });
 
 function RootComponent(props: { children: JSX.Element }) {
+	const location = useLocation();
+	const isLogger = () =>
+		location.pathname.endsWith("/logger") ||
+		location.pathname.endsWith("/logger/");
+
 	return (
 		<html lang="en">
 			<head>
@@ -51,9 +57,9 @@ function RootComponent(props: { children: JSX.Element }) {
 			</head>
 			<body>
 				<Suspense>
-					<Header />
+					{!isLogger() && <Header />}
 					{props.children}
-					<Footer />
+					{!isLogger() && <Footer />}
 				</Suspense>
 				<Scripts />
 			</body>

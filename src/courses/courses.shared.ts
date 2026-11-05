@@ -57,3 +57,18 @@ export const moveSplitInput = z.object({
 	splitId: z.uuid(),
 	direction: z.enum(["up", "down"]),
 });
+
+export const deleteCourseInput = courseIdInput;
+export const cloneCourseInput = copyCourseInput;
+
+export const generateStartFinishSplitsInput = z.object({
+	courseId: z.uuid(),
+});
+
+export const reorderCourseSplitInput = z.object({
+	courseId: z.uuid(),
+	splitId: z.uuid(),
+	newSequenceOrder: z.number().int().positive(),
+});
+
+export const deleteCourseSplitInput = splitIdInput;
