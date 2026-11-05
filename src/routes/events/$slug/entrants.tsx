@@ -1,5 +1,10 @@
 import { createFileRoute, getRouteApi, Link } from "@tanstack/solid-router";
-import { createSignal, For } from "solid-js";
+import { createSignal, For, onCleanup, onMount } from "solid-js";
+import {
+	getFollowedBibs,
+	openTelemetrySheet,
+	toggleFollowBib,
+} from "~/components/EntrantTelemetryView";
 import FormSelect from "~/components/FormSelect";
 import { Badge } from "~/components/ui/badge";
 import { Card } from "~/components/ui/card";
@@ -26,6 +31,27 @@ function EventGroupEntrantsPage() {
 	const [searchQuery, setSearchQuery] = createSignal("");
 	const [subEventFilter, setSubEventFilter] = createSignal("all");
 	const [statusFilter, setStatusFilter] = createSignal("all");
+	const [followedBibs, setFollowedBibs] = createSignal<string[]>([]);
+
+	const refreshFollowed = () => {
+		setFollowedBibs(getFollowedBibs(data().eventGroup.slug));
+	};
+
+	onMount(() => {
+		refreshFollowed();
+		const handleWatchlistChange = (e: Event) => {
+			const detail = (e as CustomEvent).detail;
+			if (detail?.slug === data().eventGroup.slug) {
+				setFollowedBibs(detail.bibs || []);
+			}
+		};
+		window.addEventListener("chekkpoint:watchlist-updated", handleWatchlistChange);
+		onCleanup(() => {
+			window.removeEventListener("chekkpoint:watchlist-updated", handleWatchlistChange);
+		});
+	});
+
+	const isFollowed = (bib: string) => followedBibs().includes(bib);
 
 	const disc = () => DISCIPLINE_META[data().eventGroup.discipline];
 
@@ -114,6 +140,7 @@ function EventGroupEntrantsPage() {
 			<Table>
 				<TableHeader>
 					<TableRow>
+						<TableHead class="w-8"></TableHead>
 						<TableHead>{disc().competitorLabel}</TableHead>
 						<TableHead>Athlete</TableHead>
 						<TableHead>Division</TableHead>
@@ -127,18 +154,43 @@ function EventGroupEntrantsPage() {
 						{(ent) => {
 							const st = ENTRANT_STATUS_META[ent.status];
 							return (
-								<TableRow>
+								<TableRow
+									onClick={() => openTelemetrySheet(ent.id)}
+									class="cursor-pointer hover:bg-forest/5"
+								>
+									<TableCell
+										class="p-2 text-center"
+										onClick={(e) => {
+											e.stopPropagation();
+											toggleFollowBib(
+												data().eventGroup.slug,
+												ent.competitorNumber,
+											);
+										}}
+									>
+										<button
+											type="button"
+											class={`cursor-pointer text-base leading-none ${
+												isFollowed(ent.competitorNumber)
+													? "text-forest font-bold"
+													: "text-muted-foreground/60 hover:text-foreground"
+											}`}
+											title={
+												isFollowed(ent.competitorNumber)
+													? "Unfollow"
+													: "Follow"
+											}
+										>
+											{isFollowed(ent.competitorNumber) ? "★" : "☆"}
+										</button>
+									</TableCell>
 									<TableCell class="font-bold tabular-nums text-forest">
 										#{ent.competitorNumber}
 									</TableCell>
 									<TableCell class="font-semibold">
-										<Link
-											to="/athletes/$personId"
-											params={{ personId: ent.personId }}
-											class="text-foreground no-underline hover:text-forest"
-										>
+										<span class="text-foreground hover:text-forest">
 											{ent.displayName}
-										</Link>
+										</span>
 									</TableCell>
 									<TableCell class="text-muted-foreground">
 										{ent.division}

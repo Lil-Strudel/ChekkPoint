@@ -1,5 +1,5 @@
 import "@tanstack/solid-start/server-only";
-import { and, asc, desc, eq, gt, lt, max } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, lt, max } from "drizzle-orm";
 import type { z } from "zod";
 import { orgRolesCan } from "../auth/access";
 import {
@@ -18,15 +18,19 @@ import {
 	organizations,
 	timingPoints,
 } from "../db/schema";
-import type {
-	copyCourseInput,
-	courseIdInput,
-	createCourseInput,
-	createSplitInput,
-	moveSplitInput,
-	splitIdInput,
-	updateCourseInput,
-	updateSplitInput,
+import {
+	SUB_SPLIT_IN,
+	SUB_SPLIT_OUT,
+	type copyCourseInput,
+	type courseIdInput,
+	type createCourseInput,
+	type createSplitInput,
+	type generateStartFinishSplitsInput,
+	type moveSplitInput,
+	type reorderCourseSplitInput,
+	type splitIdInput,
+	type updateCourseInput,
+	type updateSplitInput,
 } from "./courses.shared";
 
 const courseConstraints = {
@@ -173,6 +177,24 @@ export async function deleteCourse(
 	data: z.infer<typeof courseIdInput>,
 ) {
 	await requireCoursePermission(viewer, data.courseId, "delete");
+
+	// Pre-check references in events
+	const [eventsRef] = await db
+		.select({ count: count() })
+		.from(events)
+		.where(eq(events.courseId, data.courseId));
+	if (eventsRef && eventsRef.count > 0) {
+		throw new Error(
+			`Cannot delete course because it is used by ${eventsRef.count} event(s). Move or delete those events first.`,
+		);
+	}
+
+	// Null out copiedFromCourseId references on child courses
+	await db
+		.update(courses)
+		.set({ copiedFromCourseId: null })
+		.where(eq(courses.copiedFromCourseId, data.courseId));
+
 	await withConstraintMessages(courseConstraints, () =>
 		db.delete(courses).where(eq(courses.id, data.courseId)),
 	);
@@ -239,6 +261,112 @@ export async function createSplit(
 	return split;
 }
 
+export async function generateStartFinishSplits(
+	viewer: Viewer,
+	data: z.infer<typeof generateStartFinishSplitsInput>,
+) {
+	const organizationId = await requireCoursePermission(
+		viewer,
+		data.courseId,
+		"update",
+	);
+
+	const [course] = await db
+		.select({
+			id: courses.id,
+			name: courses.name,
+			distanceMeters: courses.distanceMeters,
+			organizationId: courses.organizationId,
+		})
+		.from(courses)
+		.where(eq(courses.id, data.courseId));
+	if (!course) throw new Error("Course not found");
+
+	const existingSplits = await db
+		.select({ id: courseSplits.id })
+		.from(courseSplits)
+		.where(eq(courseSplits.courseId, data.courseId));
+	if (existingSplits.length > 0) {
+		throw new Error("Course already has splits configured");
+	}
+
+	return db.transaction(async (tx) => {
+		// Find or create START timing point
+		let [startPoint] = await tx
+			.select({ id: timingPoints.id })
+			.from(timingPoints)
+			.where(
+				and(
+					eq(timingPoints.organizationId, organizationId),
+					eq(timingPoints.code, "START"),
+				),
+			);
+		if (!startPoint) {
+			[startPoint] = await tx
+				.insert(timingPoints)
+				.values({
+					organizationId,
+					name: "Start",
+					code: "START",
+					latitude: null,
+					longitude: null,
+					elevationMeters: null,
+				})
+				.returning({ id: timingPoints.id });
+		}
+
+		// Find or create FINISH timing point
+		let [finishPoint] = await tx
+			.select({ id: timingPoints.id })
+			.from(timingPoints)
+			.where(
+				and(
+					eq(timingPoints.organizationId, organizationId),
+					eq(timingPoints.code, "FINISH"),
+				),
+			);
+		if (!finishPoint) {
+			[finishPoint] = await tx
+				.insert(timingPoints)
+				.values({
+					organizationId,
+					name: "Finish",
+					code: "FINISH",
+					latitude: null,
+					longitude: null,
+					elevationMeters: null,
+				})
+				.returning({ id: timingPoints.id });
+		}
+
+		// Insert Start Split
+		await tx.insert(courseSplits).values({
+			courseId: course.id,
+			timingPointId: startPoint.id,
+			name: "Start",
+			sequenceOrder: 1,
+			distanceFromStartMeters: 0,
+			subSplitBitmap: SUB_SPLIT_OUT, // 2 = OUT
+			cutoffDurationSeconds: null,
+			tsdIdealDurationSeconds: null,
+			isSecretCheckpoint: false,
+		});
+
+		// Insert Finish Split
+		await tx.insert(courseSplits).values({
+			courseId: course.id,
+			timingPointId: finishPoint.id,
+			name: "Finish",
+			sequenceOrder: 2,
+			distanceFromStartMeters: course.distanceMeters,
+			subSplitBitmap: SUB_SPLIT_IN, // 1 = IN
+			cutoffDurationSeconds: null,
+			tsdIdealDurationSeconds: null,
+			isSecretCheckpoint: false,
+		});
+	});
+}
+
 async function requireSplit(viewer: Viewer, splitId: string) {
 	const [split] = await db
 		.select({
@@ -269,8 +397,31 @@ export async function deleteSplit(
 	viewer: Viewer,
 	data: z.infer<typeof splitIdInput>,
 ) {
-	await requireSplit(viewer, data.splitId);
-	await db.delete(courseSplits).where(eq(courseSplits.id, data.splitId));
+	const split = await requireSplit(viewer, data.splitId);
+	await db.transaction(async (tx) => {
+		// Delete the split
+		await tx.delete(courseSplits).where(eq(courseSplits.id, data.splitId));
+
+		// Renumber remaining splits cleanly using negative offsets to avoid unique index collisions
+		const remaining = await tx
+			.select({ id: courseSplits.id })
+			.from(courseSplits)
+			.where(eq(courseSplits.courseId, split.courseId))
+			.orderBy(asc(courseSplits.sequenceOrder));
+
+		for (let i = 0; i < remaining.length; i++) {
+			await tx
+				.update(courseSplits)
+				.set({ sequenceOrder: -1000 - i })
+				.where(eq(courseSplits.id, remaining[i].id));
+		}
+		for (let i = 0; i < remaining.length; i++) {
+			await tx
+				.update(courseSplits)
+				.set({ sequenceOrder: i + 1 })
+				.where(eq(courseSplits.id, remaining[i].id));
+		}
+	});
 }
 
 export async function moveSplit(
@@ -281,39 +432,83 @@ export async function moveSplit(
 	const up = data.direction === "up";
 
 	await db.transaction(async (tx) => {
-		const [neighbour] = await tx
+		const splits = await tx
 			.select({
 				id: courseSplits.id,
 				sequenceOrder: courseSplits.sequenceOrder,
 			})
 			.from(courseSplits)
-			.where(
-				and(
-					eq(courseSplits.courseId, split.courseId),
-					up
-						? lt(courseSplits.sequenceOrder, split.sequenceOrder)
-						: gt(courseSplits.sequenceOrder, split.sequenceOrder),
-				),
-			)
-			.orderBy(
-				up ? desc(courseSplits.sequenceOrder) : asc(courseSplits.sequenceOrder),
-			)
-			.limit(1);
-		if (!neighbour) return;
+			.where(eq(courseSplits.courseId, split.courseId))
+			.orderBy(asc(courseSplits.sequenceOrder));
 
-		// The (course_id, sequence_order) index isn't deferrable, so park one
-		// split on an unused order while the other takes its place.
-		await tx
-			.update(courseSplits)
-			.set({ sequenceOrder: -1 })
-			.where(eq(courseSplits.id, data.splitId));
-		await tx
-			.update(courseSplits)
-			.set({ sequenceOrder: split.sequenceOrder })
-			.where(eq(courseSplits.id, neighbour.id));
-		await tx
-			.update(courseSplits)
-			.set({ sequenceOrder: neighbour.sequenceOrder })
-			.where(eq(courseSplits.id, data.splitId));
+		const idx = splits.findIndex((s) => s.id === data.splitId);
+		if (idx === -1) return;
+		const targetIdx = up ? idx - 1 : idx + 1;
+		if (targetIdx < 0 || targetIdx >= splits.length) return;
+
+		// Swap items in memory
+		const [moved] = splits.splice(idx, 1);
+		splits.splice(targetIdx, 0, moved);
+
+		// Step 1: Shift to negative temporary sequence orders to avoid index collisions
+		for (let i = 0; i < splits.length; i++) {
+			await tx
+				.update(courseSplits)
+				.set({ sequenceOrder: -1000 - i })
+				.where(eq(courseSplits.id, splits[i].id));
+		}
+
+		// Step 2: Write final contiguous positive sequence orders 1..N
+		for (let i = 0; i < splits.length; i++) {
+			await tx
+				.update(courseSplits)
+				.set({ sequenceOrder: i + 1 })
+				.where(eq(courseSplits.id, splits[i].id));
+		}
+	});
+}
+
+export async function reorderCourseSplit(
+	viewer: Viewer,
+	data: z.infer<typeof reorderCourseSplitInput>,
+) {
+	await requireCoursePermission(viewer, data.courseId, "update");
+
+	await db.transaction(async (tx) => {
+		const splits = await tx
+			.select({
+				id: courseSplits.id,
+				sequenceOrder: courseSplits.sequenceOrder,
+			})
+			.from(courseSplits)
+			.where(eq(courseSplits.courseId, data.courseId))
+			.orderBy(asc(courseSplits.sequenceOrder));
+
+		const idx = splits.findIndex((s) => s.id === data.splitId);
+		if (idx === -1) return;
+		const targetIdx = Math.max(
+			0,
+			Math.min(splits.length - 1, data.newSequenceOrder - 1),
+		);
+		if (idx === targetIdx) return;
+
+		const [moved] = splits.splice(idx, 1);
+		splits.splice(targetIdx, 0, moved);
+
+		// Negative offset park
+		for (let i = 0; i < splits.length; i++) {
+			await tx
+				.update(courseSplits)
+				.set({ sequenceOrder: -1000 - i })
+				.where(eq(courseSplits.id, splits[i].id));
+		}
+
+		// Final 1..N order
+		for (let i = 0; i < splits.length; i++) {
+			await tx
+				.update(courseSplits)
+				.set({ sequenceOrder: i + 1 })
+				.where(eq(courseSplits.id, splits[i].id));
+		}
 	});
 }

@@ -37,8 +37,11 @@ function Overview() {
 
 	const upcoming = () =>
 		data()
-			.eventGroups.filter((group) => group.startDate > data().now)
-			.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+			.eventGroups.filter((group) => new Date(group.startDate) > data().now)
+			.sort(
+				(a, b) =>
+					new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+			);
 
 	const stats = () =>
 		[
@@ -135,7 +138,10 @@ function Overview() {
 								<For each={upcoming()}>
 									{(group) => (
 										<li class="flex items-center gap-5 py-4">
-											<DateBlock date={group.startDate} timeZone="UTC" />
+											<DateBlock
+												date={new Date(group.startDate)}
+												timeZone={group.timeZone || "UTC"}
+											/>
 											<div class="min-w-0 flex-1">
 												<Link
 													to="/event-groups/$eventGroupId"
@@ -149,7 +155,10 @@ function Overview() {
 												</p>
 											</div>
 											<span class="hidden shrink-0 text-sm text-muted-foreground sm:block">
-												{formatStartsIn(group.startDate, data().now)}
+												{formatStartsIn(
+													new Date(group.startDate),
+													data().now,
+												)}
 											</span>
 										</li>
 									)}

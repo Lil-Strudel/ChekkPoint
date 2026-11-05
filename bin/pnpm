@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -e
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PATH="$DIR:$PATH"
+
+if [ "$1" = "test" ]; then
+  shift
+  SCRIPT=$(node -e 'const pkg = JSON.parse(require("fs").readFileSync("package.json", "utf8")); console.log(pkg.scripts.test);')
+  # If extra args passed, append them or execute script
+  if [ $# -gt 0 ]; then
+    node "$@"
+  else
+    eval "$SCRIPT"
+  fi
+elif [ "$1" = "run" ]; then
+  shift
+  SCRIPT_NAME="$1"
+  shift
+  SCRIPT=$(node -e 'const pkg = JSON.parse(require("fs").readFileSync("package.json", "utf8")); console.log(pkg.scripts[process.argv[1]]);' "$SCRIPT_NAME")
+  eval "$SCRIPT $@"
+else
+  # Generic runner
+  SCRIPT=$(node -e 'const pkg = JSON.parse(require("fs").readFileSync("package.json", "utf8")); console.log(pkg.scripts[process.argv[1]] || "");' "$1")
+  if [ -n "$SCRIPT" ]; then
+    shift
+    eval "$SCRIPT $@"
+  else
+    echo "Unknown pnpm command: $@" >&2
+    exit 1
+  fi
+fi
