@@ -5,3 +5,20 @@ allowBuilds:
   '@journeyapps/wa-sqlite': false
   esbuild: true
   lightningcss: true
+permissions:
+  '@electric-sql/client':
+    skills: true
+  '@tanstack/db':
+    skills: true
+  '@tanstack/devtools-vite':
+    skills: true
+  '@tanstack/offline-transactions':
+    skills: true
+  '@tanstack/solid-db':
+    skills: true
+  '@tanstack/solid-router':
+    skills: true
+  '@tanstack/solid-start':
+    skills: true
+  drizzle-kit:
+    skills: true
