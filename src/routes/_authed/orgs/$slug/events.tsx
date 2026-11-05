@@ -63,7 +63,7 @@ function Events() {
 										{event.courseName}
 									</TableCell>
 									<TableCell class="whitespace-nowrap tabular-nums">
-										{formatStart(event.scheduledStart)}
+										{formatStart(event.scheduledStart, event.timeZone)}
 									</TableCell>
 									<TableCell class="text-right tabular-nums">
 										{event.lapsRequired}

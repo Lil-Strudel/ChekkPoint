@@ -1,7 +1,7 @@
 import "@tanstack/solid-start/server-only";
 import { and, eq, isNull, sql } from "drizzle-orm";
-import { db } from "../db";
-import { people, users } from "../db/schema";
+import { db, type Tx } from "../db";
+import { type NewPerson, people, users } from "../db/schema";
 
 type VerifiedUser = { id: string; name: string; email: string };
 
@@ -62,4 +62,25 @@ export async function updatePersonName(
 			.set({ name: `${name.firstName} ${name.lastName}`.trim() })
 			.where(eq(users.id, userId));
 	});
+}
+
+/**
+ * Reuses the person with this email, preferring one already claimed by a login
+ * so access applies immediately. People without an email are always new.
+ */
+export async function findOrCreatePerson(tx: Tx, person: NewPerson) {
+	if (person.email) {
+		const [match] = await tx
+			.select({ id: people.id })
+			.from(people)
+			.where(sql`lower(${people.email}) = lower(${person.email})`)
+			.orderBy(sql`${people.userId} is null`)
+			.limit(1);
+		if (match) return match.id;
+	}
+	const [created] = await tx
+		.insert(people)
+		.values(person)
+		.returning({ id: people.id });
+	return created.id;
 }

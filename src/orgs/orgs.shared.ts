@@ -70,15 +70,37 @@ export const createEventGroupInput = z.object({
 	endDate: z.iso.date(),
 });
 
-export const createTimingPointInput = z.object({
-	organizationId: z.uuid(),
+const optionalNumber = z.number().nullable();
+
+const timingPointFields = {
 	name: z.string().trim().min(1),
 	code: z
 		.string()
 		.trim()
 		.min(1)
 		.transform((c) => c.toUpperCase()),
+	latitude: optionalNumber.refine(
+		(v) => v === null || Math.abs(v) <= 90,
+		"Latitude is between -90 and 90.",
+	),
+	longitude: optionalNumber.refine(
+		(v) => v === null || Math.abs(v) <= 180,
+		"Longitude is between -180 and 180.",
+	),
+	elevationMeters: z.number().int().nullable(),
+};
+
+export const createTimingPointInput = z.object({
+	organizationId: z.uuid(),
+	...timingPointFields,
 });
+
+export const updateTimingPointInput = z.object({
+	timingPointId: z.uuid(),
+	...timingPointFields,
+});
+
+export const timingPointIdInput = z.object({ timingPointId: z.uuid() });
 
 export const assignStaffInput = z.object({
 	eventGroupId: z.uuid(),

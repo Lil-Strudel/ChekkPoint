@@ -2,6 +2,7 @@ import "@tanstack/solid-start/server-only";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { orgRolesCan } from "../auth/access";
+import { findOrCreatePerson } from "../auth/people.server";
 import {
 	canManageStaff,
 	canRecordAt,
@@ -12,6 +13,7 @@ import {
 } from "../auth/permissions.server";
 import type { Viewer } from "../auth/session.server";
 import { db } from "../db";
+import { withConstraintMessages } from "../db/errors.server";
 import {
 	courses,
 	eventGroupStaff,
@@ -33,6 +35,8 @@ import type {
 	createTimingPointInput,
 	recordTimeInput,
 	removeStaffInput,
+	timingPointIdInput,
+	updateTimingPointInput,
 } from "./orgs.shared";
 import { slugify } from "./orgs.shared";
 
@@ -94,7 +98,12 @@ export async function getOrganizationOverview(viewer: Viewer, slug: string) {
 		invite: orgRolesCan(myRoles, "invitation", "create"),
 		updateMembers: orgRolesCan(myRoles, "member", "update"),
 		createEventGroup: orgRolesCan(myRoles, "eventGroup", "create"),
+		createCourse: orgRolesCan(myRoles, "course", "create"),
+		updateCourse: orgRolesCan(myRoles, "course", "update"),
+		deleteCourse: orgRolesCan(myRoles, "course", "delete"),
 		createTimingPoint: orgRolesCan(myRoles, "timingPoint", "create"),
+		updateTimingPoint: orgRolesCan(myRoles, "timingPoint", "update"),
+		deleteTimingPoint: orgRolesCan(myRoles, "timingPoint", "delete"),
 		updateOrganization: orgRolesCan(myRoles, "organization", "update"),
 		deleteOrganization: orgRolesCan(myRoles, "organization", "delete"),
 	};
@@ -136,6 +145,7 @@ export async function getOrganizationOverview(viewer: Viewer, slug: string) {
 					discipline: eventGroups.discipline,
 					startDate: eventGroups.startDate,
 					endDate: eventGroups.endDate,
+					location: eventGroups.location,
 				})
 				.from(eventGroups)
 				.where(eq(eventGroups.organizationId, org.id))
@@ -145,6 +155,8 @@ export async function getOrganizationOverview(viewer: Viewer, slug: string) {
 					id: timingPoints.id,
 					name: timingPoints.name,
 					code: timingPoints.code,
+					latitude: timingPoints.latitude,
+					longitude: timingPoints.longitude,
 					elevationMeters: timingPoints.elevationMeters,
 				})
 				.from(timingPoints)
@@ -166,6 +178,7 @@ export async function getOrganizationOverview(viewer: Viewer, slug: string) {
 					name: events.name,
 					eventGroupId: eventGroups.id,
 					eventGroupName: eventGroups.name,
+					timeZone: eventGroups.timeZone,
 					courseName: courses.name,
 					scheduledStart: events.scheduledStart,
 					lapsRequired: events.lapsRequired,
@@ -215,6 +228,12 @@ export async function createEventGroup(
 	return group;
 }
 
+const timingPointConstraints = {
+	timing_points_org_code_idx: "Another timing point already uses that code.",
+	course_splits_timing_point_id_timing_points_id_fkey:
+		"A course still passes this timing point. Remove it from those courses first.",
+};
+
 export async function createTimingPoint(
 	viewer: Viewer,
 	data: z.infer<typeof createTimingPointInput>,
@@ -225,13 +244,48 @@ export async function createTimingPoint(
 		"timingPoint",
 		"create",
 	);
-	const [point] = await db
-		.insert(timingPoints)
-		.values(data)
-		.onConflictDoNothing()
-		.returning({ id: timingPoints.id });
-	if (!point) throw new Error(`Timing point ${data.code} already exists`);
+	const [point] = await withConstraintMessages(timingPointConstraints, () =>
+		db.insert(timingPoints).values(data).returning({ id: timingPoints.id }),
+	);
 	return point;
+}
+
+async function requireTimingPointPermission(
+	viewer: Viewer,
+	timingPointId: string,
+	action: "update" | "delete",
+) {
+	const [point] = await db
+		.select({ organizationId: timingPoints.organizationId })
+		.from(timingPoints)
+		.where(eq(timingPoints.id, timingPointId));
+	if (!point) throw new ForbiddenError();
+	await requireOrgPermission(
+		viewer,
+		point.organizationId,
+		"timingPoint",
+		action,
+	);
+}
+
+export async function updateTimingPoint(
+	viewer: Viewer,
+	{ timingPointId, ...data }: z.infer<typeof updateTimingPointInput>,
+) {
+	await requireTimingPointPermission(viewer, timingPointId, "update");
+	await withConstraintMessages(timingPointConstraints, () =>
+		db.update(timingPoints).set(data).where(eq(timingPoints.id, timingPointId)),
+	);
+}
+
+export async function deleteTimingPoint(
+	viewer: Viewer,
+	data: z.infer<typeof timingPointIdInput>,
+) {
+	await requireTimingPointPermission(viewer, data.timingPointId, "delete");
+	await withConstraintMessages(timingPointConstraints, () =>
+		db.delete(timingPoints).where(eq(timingPoints.id, data.timingPointId)),
+	);
 }
 
 export async function getEventGroupPage(viewer: Viewer, eventGroupId: string) {
@@ -371,26 +425,11 @@ export async function assignStaff(
 	}
 
 	return db.transaction(async (tx) => {
-		// Prefer a person already claimed by a login so access applies immediately.
-		const [match] = await tx
-			.select({ id: people.id })
-			.from(people)
-			.where(sql`lower(${people.email}) = lower(${data.email})`)
-			.orderBy(sql`${people.userId} is null`)
-			.limit(1);
-
-		const personId =
-			match?.id ??
-			(
-				await tx
-					.insert(people)
-					.values({
-						firstName: data.firstName,
-						lastName: data.lastName,
-						email: data.email,
-					})
-					.returning({ id: people.id })
-			)[0].id;
+		const personId = await findOrCreatePerson(tx, {
+			firstName: data.firstName,
+			lastName: data.lastName,
+			email: data.email,
+		});
 
 		const [staff] = await tx
 			.insert(eventGroupStaff)
