@@ -10,6 +10,7 @@ export const statements = {
 	eventGroup: ["create", "update", "delete"],
 	course: ["create", "update", "delete"],
 	timingPoint: ["create", "update", "delete"],
+	entrant: ["create", "update", "delete"],
 	staff: ["assign", "remove"],
 	timing: ["record", "correct", "confirm", "allowance"],
 } as const;
@@ -20,6 +21,7 @@ const runEvents = {
 	eventGroup: ["create", "update", "delete"],
 	course: ["create", "update", "delete"],
 	timingPoint: ["create", "update", "delete"],
+	entrant: ["create", "update", "delete"],
 	staff: ["assign", "remove"],
 	timing: ["record", "correct", "confirm", "allowance"],
 } as const;

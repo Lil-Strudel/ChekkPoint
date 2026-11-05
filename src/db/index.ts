@@ -6,3 +6,5 @@ import { env } from "../env";
 const pool = new Pool({ connectionString: env.DATABASE_URL });
 
 export const db = drizzle({ client: pool });
+
+export type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
