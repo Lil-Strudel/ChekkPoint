@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as ForAthletesRouteImport } from './routes/for-athletes'
+import { Route as ForOrganizersRouteImport } from './routes/for-organizers'
+import { Route as ForVolunteersRouteImport } from './routes/for-volunteers'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as HelloRouteImport } from './routes/hello'
 import { Route as ManageDbRouteImport } from './routes/manage-db'
@@ -20,6 +23,12 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as AuthedAccountRouteImport } from './routes/_authed/account'
+import { Route as AthletesIndexRouteImport } from './routes/athletes/index'
+import { Route as AthletesPersonIdRouteImport } from './routes/athletes/$personId'
+import { Route as CoursesCourseIdRouteImport } from './routes/courses/$courseId'
+import { Route as EventsIndexRouteImport } from './routes/events/index'
+import { Route as EventsSlugRouteRouteImport } from './routes/events/$slug/route'
+import { Route as OrganizersSlugRouteImport } from './routes/organizers/$slug'
 import { Route as AuthedAcceptInvitationInvitationIdRouteImport } from './routes/_authed/accept-invitation/$invitationId'
 import { Route as AuthedEventGroupsEventGroupIdRouteRouteImport } from './routes/_authed/event-groups/$eventGroupId/route'
 import { Route as AuthedOrgsIndexRouteImport } from './routes/_authed/orgs/index'
@@ -27,6 +36,11 @@ import { Route as AuthedOrgsSlugRouteRouteImport } from './routes/_authed/orgs/$
 import { Route as AuthedOrgsNewRouteImport } from './routes/_authed/orgs/new'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiShapesHelloWorldRouteImport } from './routes/api/shapes/hello-world'
+import { Route as EventsSlugIndexRouteImport } from './routes/events/$slug/index'
+import { Route as EventsSlugCourseRouteImport } from './routes/events/$slug/course'
+import { Route as EventsSlugCrewRouteImport } from './routes/events/$slug/crew'
+import { Route as EventsSlugEntrantsRouteImport } from './routes/events/$slug/entrants'
+import { Route as EventsSlugResultsRouteImport } from './routes/events/$slug/results'
 import { Route as AuthedEventGroupsEventGroupIdIndexRouteImport } from './routes/_authed/event-groups/$eventGroupId/index'
 import { Route as AuthedEventGroupsEventGroupIdEntrantsRouteImport } from './routes/_authed/event-groups/$eventGroupId/entrants'
 import { Route as AuthedEventGroupsEventGroupIdEventsRouteImport } from './routes/_authed/event-groups/$eventGroupId/events'
@@ -53,6 +67,21 @@ const AuthedRoute = AuthedRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForAthletesRoute = ForAthletesRouteImport.update({
+  id: '/for-athletes',
+  path: '/for-athletes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForOrganizersRoute = ForOrganizersRouteImport.update({
+  id: '/for-organizers',
+  path: '/for-organizers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForVolunteersRoute = ForVolunteersRouteImport.update({
+  id: '/for-volunteers',
+  path: '/for-volunteers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -95,6 +124,36 @@ const AuthedAccountRoute = AuthedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AthletesIndexRoute = AthletesIndexRouteImport.update({
+  id: '/athletes/',
+  path: '/athletes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AthletesPersonIdRoute = AthletesPersonIdRouteImport.update({
+  id: '/athletes/$personId',
+  path: '/athletes/$personId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
+  id: '/courses/$courseId',
+  path: '/courses/$courseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsIndexRoute = EventsIndexRouteImport.update({
+  id: '/events/',
+  path: '/events/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsSlugRouteRoute = EventsSlugRouteRouteImport.update({
+  id: '/events/$slug',
+  path: '/events/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizersSlugRoute = OrganizersSlugRouteImport.update({
+  id: '/organizers/$slug',
+  path: '/organizers/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedAcceptInvitationInvitationIdRoute =
   AuthedAcceptInvitationInvitationIdRouteImport.update({
     id: '/accept-invitation/$invitationId',
@@ -131,6 +190,31 @@ const ApiShapesHelloWorldRoute = ApiShapesHelloWorldRouteImport.update({
   id: '/api/shapes/hello-world',
   path: '/api/shapes/hello-world',
   getParentRoute: () => rootRouteImport,
+} as any)
+const EventsSlugIndexRoute = EventsSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventsSlugRouteRoute,
+} as any)
+const EventsSlugCourseRoute = EventsSlugCourseRouteImport.update({
+  id: '/course',
+  path: '/course',
+  getParentRoute: () => EventsSlugRouteRoute,
+} as any)
+const EventsSlugCrewRoute = EventsSlugCrewRouteImport.update({
+  id: '/crew',
+  path: '/crew',
+  getParentRoute: () => EventsSlugRouteRoute,
+} as any)
+const EventsSlugEntrantsRoute = EventsSlugEntrantsRouteImport.update({
+  id: '/entrants',
+  path: '/entrants',
+  getParentRoute: () => EventsSlugRouteRoute,
+} as any)
+const EventsSlugResultsRoute = EventsSlugResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => EventsSlugRouteRoute,
 } as any)
 const AuthedEventGroupsEventGroupIdIndexRoute =
   AuthedEventGroupsEventGroupIdIndexRouteImport.update({
@@ -210,6 +294,9 @@ const AuthedOrgsSlugCoursesCourseIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/for-athletes': typeof ForAthletesRoute
+  '/for-organizers': typeof ForOrganizersRoute
+  '/for-volunteers': typeof ForVolunteersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/hello': typeof HelloRoute
   '/manage-db': typeof ManageDbRoute
@@ -217,14 +304,25 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/events/$slug': typeof EventsSlugRouteRouteWithChildren
   '/account': typeof AuthedAccountRoute
+  '/athletes/$personId': typeof AthletesPersonIdRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/organizers/$slug': typeof OrganizersSlugRoute
+  '/athletes/': typeof AthletesIndexRoute
+  '/events/': typeof EventsIndexRoute
   '/event-groups/$eventGroupId': typeof AuthedEventGroupsEventGroupIdRouteRouteWithChildren
   '/orgs/$slug': typeof AuthedOrgsSlugRouteRouteWithChildren
   '/accept-invitation/$invitationId': typeof AuthedAcceptInvitationInvitationIdRoute
   '/orgs/new': typeof AuthedOrgsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
+  '/events/$slug/course': typeof EventsSlugCourseRoute
+  '/events/$slug/crew': typeof EventsSlugCrewRoute
+  '/events/$slug/entrants': typeof EventsSlugEntrantsRoute
+  '/events/$slug/results': typeof EventsSlugResultsRoute
   '/orgs/': typeof AuthedOrgsIndexRoute
+  '/events/$slug/': typeof EventsSlugIndexRoute
   '/event-groups/$eventGroupId/entrants': typeof AuthedEventGroupsEventGroupIdEntrantsRoute
   '/event-groups/$eventGroupId/events': typeof AuthedEventGroupsEventGroupIdEventsRoute
   '/event-groups/$eventGroupId/staff': typeof AuthedEventGroupsEventGroupIdStaffRoute
@@ -242,6 +340,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/for-athletes': typeof ForAthletesRoute
+  '/for-organizers': typeof ForOrganizersRoute
+  '/for-volunteers': typeof ForVolunteersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/hello': typeof HelloRoute
   '/manage-db': typeof ManageDbRoute
@@ -250,11 +351,21 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/account': typeof AuthedAccountRoute
+  '/athletes/$personId': typeof AthletesPersonIdRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/organizers/$slug': typeof OrganizersSlugRoute
+  '/athletes': typeof AthletesIndexRoute
+  '/events': typeof EventsIndexRoute
   '/accept-invitation/$invitationId': typeof AuthedAcceptInvitationInvitationIdRoute
   '/orgs/new': typeof AuthedOrgsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
+  '/events/$slug/course': typeof EventsSlugCourseRoute
+  '/events/$slug/crew': typeof EventsSlugCrewRoute
+  '/events/$slug/entrants': typeof EventsSlugEntrantsRoute
+  '/events/$slug/results': typeof EventsSlugResultsRoute
   '/orgs': typeof AuthedOrgsIndexRoute
+  '/events/$slug': typeof EventsSlugIndexRoute
   '/event-groups/$eventGroupId/entrants': typeof AuthedEventGroupsEventGroupIdEntrantsRoute
   '/event-groups/$eventGroupId/events': typeof AuthedEventGroupsEventGroupIdEventsRoute
   '/event-groups/$eventGroupId/staff': typeof AuthedEventGroupsEventGroupIdStaffRoute
@@ -274,6 +385,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/about': typeof AboutRoute
+  '/for-athletes': typeof ForAthletesRoute
+  '/for-organizers': typeof ForOrganizersRoute
+  '/for-volunteers': typeof ForVolunteersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/hello': typeof HelloRoute
   '/manage-db': typeof ManageDbRoute
@@ -281,14 +395,25 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/events/$slug': typeof EventsSlugRouteRouteWithChildren
   '/_authed/account': typeof AuthedAccountRoute
+  '/athletes/$personId': typeof AthletesPersonIdRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/organizers/$slug': typeof OrganizersSlugRoute
+  '/athletes/': typeof AthletesIndexRoute
+  '/events/': typeof EventsIndexRoute
   '/_authed/event-groups/$eventGroupId': typeof AuthedEventGroupsEventGroupIdRouteRouteWithChildren
   '/_authed/orgs/$slug': typeof AuthedOrgsSlugRouteRouteWithChildren
   '/_authed/accept-invitation/$invitationId': typeof AuthedAcceptInvitationInvitationIdRoute
   '/_authed/orgs/new': typeof AuthedOrgsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/shapes/hello-world': typeof ApiShapesHelloWorldRoute
+  '/events/$slug/course': typeof EventsSlugCourseRoute
+  '/events/$slug/crew': typeof EventsSlugCrewRoute
+  '/events/$slug/entrants': typeof EventsSlugEntrantsRoute
+  '/events/$slug/results': typeof EventsSlugResultsRoute
   '/_authed/orgs/': typeof AuthedOrgsIndexRoute
+  '/events/$slug/': typeof EventsSlugIndexRoute
   '/_authed/event-groups/$eventGroupId/entrants': typeof AuthedEventGroupsEventGroupIdEntrantsRoute
   '/_authed/event-groups/$eventGroupId/events': typeof AuthedEventGroupsEventGroupIdEventsRoute
   '/_authed/event-groups/$eventGroupId/staff': typeof AuthedEventGroupsEventGroupIdStaffRoute
@@ -308,6 +433,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/for-athletes'
+    | '/for-organizers'
+    | '/for-volunteers'
     | '/forgot-password'
     | '/hello'
     | '/manage-db'
@@ -315,14 +443,25 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/events/$slug'
     | '/account'
+    | '/athletes/$personId'
+    | '/courses/$courseId'
+    | '/organizers/$slug'
+    | '/athletes/'
+    | '/events/'
     | '/event-groups/$eventGroupId'
     | '/orgs/$slug'
     | '/accept-invitation/$invitationId'
     | '/orgs/new'
     | '/api/auth/$'
     | '/api/shapes/hello-world'
+    | '/events/$slug/course'
+    | '/events/$slug/crew'
+    | '/events/$slug/entrants'
+    | '/events/$slug/results'
     | '/orgs/'
+    | '/events/$slug/'
     | '/event-groups/$eventGroupId/entrants'
     | '/event-groups/$eventGroupId/events'
     | '/event-groups/$eventGroupId/staff'
@@ -340,6 +479,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/for-athletes'
+    | '/for-organizers'
+    | '/for-volunteers'
     | '/forgot-password'
     | '/hello'
     | '/manage-db'
@@ -348,11 +490,21 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/account'
+    | '/athletes/$personId'
+    | '/courses/$courseId'
+    | '/organizers/$slug'
+    | '/athletes'
+    | '/events'
     | '/accept-invitation/$invitationId'
     | '/orgs/new'
     | '/api/auth/$'
     | '/api/shapes/hello-world'
+    | '/events/$slug/course'
+    | '/events/$slug/crew'
+    | '/events/$slug/entrants'
+    | '/events/$slug/results'
     | '/orgs'
+    | '/events/$slug'
     | '/event-groups/$eventGroupId/entrants'
     | '/event-groups/$eventGroupId/events'
     | '/event-groups/$eventGroupId/staff'
@@ -371,6 +523,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_authed'
     | '/about'
+    | '/for-athletes'
+    | '/for-organizers'
+    | '/for-volunteers'
     | '/forgot-password'
     | '/hello'
     | '/manage-db'
@@ -378,14 +533,25 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/events/$slug'
     | '/_authed/account'
+    | '/athletes/$personId'
+    | '/courses/$courseId'
+    | '/organizers/$slug'
+    | '/athletes/'
+    | '/events/'
     | '/_authed/event-groups/$eventGroupId'
     | '/_authed/orgs/$slug'
     | '/_authed/accept-invitation/$invitationId'
     | '/_authed/orgs/new'
     | '/api/auth/$'
     | '/api/shapes/hello-world'
+    | '/events/$slug/course'
+    | '/events/$slug/crew'
+    | '/events/$slug/entrants'
+    | '/events/$slug/results'
     | '/_authed/orgs/'
+    | '/events/$slug/'
     | '/_authed/event-groups/$eventGroupId/entrants'
     | '/_authed/event-groups/$eventGroupId/events'
     | '/_authed/event-groups/$eventGroupId/staff'
@@ -405,6 +571,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  ForAthletesRoute: typeof ForAthletesRoute
+  ForOrganizersRoute: typeof ForOrganizersRoute
+  ForVolunteersRoute: typeof ForVolunteersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HelloRoute: typeof HelloRoute
   ManageDbRoute: typeof ManageDbRoute
@@ -412,6 +581,12 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  EventsSlugRouteRoute: typeof EventsSlugRouteRouteWithChildren
+  AthletesPersonIdRoute: typeof AthletesPersonIdRoute
+  CoursesCourseIdRoute: typeof CoursesCourseIdRoute
+  OrganizersSlugRoute: typeof OrganizersSlugRoute
+  AthletesIndexRoute: typeof AthletesIndexRoute
+  EventsIndexRoute: typeof EventsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiShapesHelloWorldRoute: typeof ApiShapesHelloWorldRoute
 }
@@ -437,6 +612,27 @@ declare module '@tanstack/solid-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-athletes': {
+      id: '/for-athletes'
+      path: '/for-athletes'
+      fullPath: '/for-athletes'
+      preLoaderRoute: typeof ForAthletesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-organizers': {
+      id: '/for-organizers'
+      path: '/for-organizers'
+      fullPath: '/for-organizers'
+      preLoaderRoute: typeof ForOrganizersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-volunteers': {
+      id: '/for-volunteers'
+      path: '/for-volunteers'
+      fullPath: '/for-volunteers'
+      preLoaderRoute: typeof ForVolunteersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -495,6 +691,48 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof AuthedAccountRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/athletes/': {
+      id: '/athletes/'
+      path: '/athletes'
+      fullPath: '/athletes/'
+      preLoaderRoute: typeof AthletesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/athletes/$personId': {
+      id: '/athletes/$personId'
+      path: '/athletes/$personId'
+      fullPath: '/athletes/$personId'
+      preLoaderRoute: typeof AthletesPersonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/courses/$courseId': {
+      id: '/courses/$courseId'
+      path: '/courses/$courseId'
+      fullPath: '/courses/$courseId'
+      preLoaderRoute: typeof CoursesCourseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/': {
+      id: '/events/'
+      path: '/events'
+      fullPath: '/events/'
+      preLoaderRoute: typeof EventsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/$slug': {
+      id: '/events/$slug'
+      path: '/events/$slug'
+      fullPath: '/events/$slug'
+      preLoaderRoute: typeof EventsSlugRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organizers/$slug': {
+      id: '/organizers/$slug'
+      path: '/organizers/$slug'
+      fullPath: '/organizers/$slug'
+      preLoaderRoute: typeof OrganizersSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authed/accept-invitation/$invitationId': {
       id: '/_authed/accept-invitation/$invitationId'
       path: '/accept-invitation/$invitationId'
@@ -543,6 +781,41 @@ declare module '@tanstack/solid-router' {
       fullPath: '/api/shapes/hello-world'
       preLoaderRoute: typeof ApiShapesHelloWorldRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/events/$slug/': {
+      id: '/events/$slug/'
+      path: '/'
+      fullPath: '/events/$slug/'
+      preLoaderRoute: typeof EventsSlugIndexRouteImport
+      parentRoute: typeof EventsSlugRouteRoute
+    }
+    '/events/$slug/course': {
+      id: '/events/$slug/course'
+      path: '/course'
+      fullPath: '/events/$slug/course'
+      preLoaderRoute: typeof EventsSlugCourseRouteImport
+      parentRoute: typeof EventsSlugRouteRoute
+    }
+    '/events/$slug/crew': {
+      id: '/events/$slug/crew'
+      path: '/crew'
+      fullPath: '/events/$slug/crew'
+      preLoaderRoute: typeof EventsSlugCrewRouteImport
+      parentRoute: typeof EventsSlugRouteRoute
+    }
+    '/events/$slug/entrants': {
+      id: '/events/$slug/entrants'
+      path: '/entrants'
+      fullPath: '/events/$slug/entrants'
+      preLoaderRoute: typeof EventsSlugEntrantsRouteImport
+      parentRoute: typeof EventsSlugRouteRoute
+    }
+    '/events/$slug/results': {
+      id: '/events/$slug/results'
+      path: '/results'
+      fullPath: '/events/$slug/results'
+      preLoaderRoute: typeof EventsSlugResultsRouteImport
+      parentRoute: typeof EventsSlugRouteRoute
     }
     '/_authed/event-groups/$eventGroupId/': {
       id: '/_authed/event-groups/$eventGroupId/'
@@ -713,10 +986,33 @@ const AuthedRouteChildren: AuthedRouteChildren = {
 const AuthedRouteWithChildren =
   AuthedRoute._addFileChildren(AuthedRouteChildren)
 
+interface EventsSlugRouteRouteChildren {
+  EventsSlugCourseRoute: typeof EventsSlugCourseRoute
+  EventsSlugCrewRoute: typeof EventsSlugCrewRoute
+  EventsSlugEntrantsRoute: typeof EventsSlugEntrantsRoute
+  EventsSlugResultsRoute: typeof EventsSlugResultsRoute
+  EventsSlugIndexRoute: typeof EventsSlugIndexRoute
+}
+
+const EventsSlugRouteRouteChildren: EventsSlugRouteRouteChildren = {
+  EventsSlugCourseRoute: EventsSlugCourseRoute,
+  EventsSlugCrewRoute: EventsSlugCrewRoute,
+  EventsSlugEntrantsRoute: EventsSlugEntrantsRoute,
+  EventsSlugResultsRoute: EventsSlugResultsRoute,
+  EventsSlugIndexRoute: EventsSlugIndexRoute,
+}
+
+const EventsSlugRouteRouteWithChildren = EventsSlugRouteRoute._addFileChildren(
+  EventsSlugRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
   AboutRoute: AboutRoute,
+  ForAthletesRoute: ForAthletesRoute,
+  ForOrganizersRoute: ForOrganizersRoute,
+  ForVolunteersRoute: ForVolunteersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HelloRoute: HelloRoute,
   ManageDbRoute: ManageDbRoute,
@@ -724,6 +1020,12 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  EventsSlugRouteRoute: EventsSlugRouteRouteWithChildren,
+  AthletesPersonIdRoute: AthletesPersonIdRoute,
+  CoursesCourseIdRoute: CoursesCourseIdRoute,
+  OrganizersSlugRoute: OrganizersSlugRoute,
+  AthletesIndexRoute: AthletesIndexRoute,
+  EventsIndexRoute: EventsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiShapesHelloWorldRoute: ApiShapesHelloWorldRoute,
 }
