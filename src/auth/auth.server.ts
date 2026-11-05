@@ -12,9 +12,12 @@ import {
 	organization,
 } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start/solid";
+import { eq } from "drizzle-orm";
 import { db } from "../db";
 import {
 	accounts,
+	courses,
+	eventGroups,
 	organizationInvitations,
 	organizationMembers,
 	organizations,
@@ -196,6 +199,19 @@ export const auth = betterAuth({
 				},
 				async beforeUpdateOrganization({ organization }) {
 					assertValidOrganization(organization);
+				},
+				// Restrict foreign keys (events -> courses, splits -> timing points)
+				// fail midway through the organization's cascade, so clear the
+				// dependent rows in an order that satisfies them first.
+				async beforeDeleteOrganization({ organization }) {
+					await db.transaction(async (tx) => {
+						await tx
+							.delete(eventGroups)
+							.where(eq(eventGroups.organizationId, organization.id));
+						await tx
+							.delete(courses)
+							.where(eq(courses.organizationId, organization.id));
+					});
 				},
 			},
 			async sendInvitationEmail({ id, email, organization, inviter, role }) {
