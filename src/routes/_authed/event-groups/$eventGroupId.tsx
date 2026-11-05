@@ -1,4 +1,9 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/solid-router";
+import {
+	createFileRoute,
+	Link,
+	notFound,
+	useRouter,
+} from "@tanstack/solid-router";
 import { createSignal, For, Show } from "solid-js";
 import { ORG_ROLE_LABELS } from "~/auth/access";
 import FormSelect from "~/components/FormSelect";
@@ -32,11 +37,17 @@ import {
 	getEventGroup,
 	saveStaff,
 } from "~/orgs/orgs.functions";
-import { STAFF_ROLE_LABELS, STAFF_ROLES } from "~/orgs/orgs.shared";
+import {
+	eventGroupIdInput,
+	STAFF_ROLE_LABELS,
+	STAFF_ROLES,
+} from "~/orgs/orgs.shared";
 
 export const Route = createFileRoute("/_authed/event-groups/$eventGroupId")({
-	loader: ({ params }) =>
-		getEventGroup({ data: { eventGroupId: params.eventGroupId } }),
+	loader: ({ params }) => {
+		if (!eventGroupIdInput.safeParse(params).success) throw notFound();
+		return getEventGroup({ data: { eventGroupId: params.eventGroupId } });
+	},
 	notFoundComponent: () => (
 		<main class="page-wrap pb-24 pt-16">
 			<p class="page-label">Event group</p>
